@@ -1,0 +1,45 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Michiel Van Herreweghe — DevOps & Software Engineer',
+  description = 'DevOps & Software Engineer building resilient pipelines, clean infrastructure, and software that ships.',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+    {/* Apply persisted theme + language before paint to avoid a flash. */}
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('mvh-theme');
+          document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+          var l = localStorage.getItem('mvh-lang');
+          if (l === 'en' || l === 'nl' || l === 'fr') document.documentElement.lang = l;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    {/* User-fillable <image-slot> custom element (drag-and-drop image placeholders). */}
+    <script is:inline src="/image-slot.js"></script>
+  </body>
+</html>
