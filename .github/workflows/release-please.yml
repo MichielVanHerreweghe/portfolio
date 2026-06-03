@@ -9,16 +9,149 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
   release-please:
     name: Release PR & tagging
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      # Frontend image
+      frontend_released: ${{ steps.release.outputs['src/frontend--release_created'] }}
+      frontend_version: ${{ steps.release.outputs['src/frontend--version'] }}
+      # Backend image — active once "src/backend" is added to release-please-config.json.
+      backend_released: ${{ steps.release.outputs['src/backend--release_created'] }}
+      backend_version: ${{ steps.release.outputs['src/backend--version'] }}
+      # Helm chart — active once "charts/portfolio" is added to release-please-config.json.
+      chart_released: ${{ steps.release.outputs['charts/portfolio--release_created'] }}
+      chart_version: ${{ steps.release.outputs['charts/portfolio--version'] }}
     steps:
       - name: Run release-please
+        id: release
         uses: googleapis/release-please-action@v4
         with:
           config-file: .github/release-please-config.json
           manifest-file: .github/.release-please-manifest.json
+
+  publish-frontend:
+    name: Publish frontend image
+    needs: release-please
+    if: needs.release-please.outputs.frontend_released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image tags & labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # metadata-action lowercases the image name, so the owner's casing is fine here.
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/portfolio-frontend
+          tags: |
+            type=semver,pattern={{version}},value=${{ needs.release-please.outputs.frontend_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.frontend_version }}
+            type=raw,value=latest
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: src/frontend
+          file: src/frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish-backend:
+    name: Publish backend image
+    needs: release-please
+    if: needs.release-please.outputs.backend_released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image tags & labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/portfolio-backend
+          tags: |
+            type=semver,pattern={{version}},value=${{ needs.release-please.outputs.backend_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.backend_version }}
+            type=raw,value=latest
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: src/backend
+          file: src/backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish-chart:
+    name: Publish Helm chart
+    needs: release-please
+    if: needs.release-please.outputs.chart_released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Log in to GHCR for Helm OCI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | helm registry login "${REGISTRY}" --username "${{ github.actor }}" --password-stdin
+
+      - name: Package & push chart
+        run: |
+          # GHCR repository paths must be lowercase.
+          owner_lc="${GITHUB_REPOSITORY_OWNER,,}"
+          helm package charts/portfolio --version "${CHART_VERSION}" --destination .
+          chart_tgz="$(ls portfolio-*.tgz)"
+          helm push "${chart_tgz}" "oci://${REGISTRY}/${owner_lc}/charts"
+        env:
+          CHART_VERSION: ${{ needs.release-please.outputs.chart_version }}
