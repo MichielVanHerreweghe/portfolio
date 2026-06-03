@@ -4,6 +4,7 @@ import { Icon } from '../icons.jsx';
 import { Reveal, Kicker } from '../primitives.jsx';
 import { ContactFooter } from '../ContactFooter.jsx';
 import { useT } from '../../lib/i18n.jsx';
+import { srcSet, sizes } from '../../lib/img.js';
 
 function PortfolioHero({ filter, setFilter }) {
   const { C } = useT();
@@ -41,7 +42,7 @@ function ProjectCard({ p, big }) {
     <Reveal>
       <a href={"#/project/" + p.id} className="card proj-card" style={{ display: "block", overflow: "hidden", color: "var(--text)", height: "100%" }}>
         <div style={{ position: "relative" }}>
-          <image-slot id={"port-" + p.id} src={p.cover} style={{ width: "100%", height: big ? 420 : 260 }} shape="rect" placeholder={p.kind}></image-slot>
+          <image-slot id={"port-" + p.id} src={p.cover} srcset={srcSet(p.cover)} sizes={sizes(big ? 90 : 45)} style={{ width: "100%", height: big ? 420 : 260 }} shape="rect" placeholder={p.kind}></image-slot>
           <span className="mono proj-visit" style={{ position: "absolute", top: 14, right: 14, background: "var(--volt)", color: "#0B0B0C", fontSize: 12, fontWeight: 700, padding: "8px 12px", borderRadius: 3, display: "inline-flex", alignItems: "center", gap: 7, opacity: 0, transform: "translateY(-6px)", transition: "all .3s var(--ease)" }}>
             {u.visit.toUpperCase()} <Icon.arrowUR />
           </span>

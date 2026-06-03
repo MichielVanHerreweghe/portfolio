@@ -11,6 +11,7 @@ import { Icon } from '../icons.jsx';
 import { Reveal, Kicker, Button } from '../primitives.jsx';
 import { ContactFooter } from '../ContactFooter.jsx';
 import { useT } from '../../lib/i18n.jsx';
+import { srcSet, sizes } from '../../lib/img.js';
 
 export function ProjectDetailPage({ go, id }) {
   const { C } = useT();
@@ -73,13 +74,17 @@ export function ProjectDetailPage({ go, id }) {
         {shots.length > 0 ? (
           <Reveal>
             <div className="pd-grid">
-              {shots.map((s, i) => (
-                <a key={s.src || i} href={s.src} target="_blank" rel="noopener noreferrer"
-                  className={"pd-tile" + (i % 3 === 0 ? " wide" : "")}>
-                  <img src={s.src} alt={s.label || p.title} loading="lazy" />
-                  {s.label && <span className="pd-cap mono">{s.label}</span>}
-                </a>
-              ))}
+              {shots.map((s, i) => {
+                const wide = i % 3 === 0;
+                return (
+                  <a key={s.src || i} href={s.src} target="_blank" rel="noopener noreferrer"
+                    className={"pd-tile" + (wide ? " wide" : "")}>
+                    <img src={s.src} srcSet={srcSet(s.src)} sizes={sizes(wide ? 90 : 45)}
+                      alt={s.label || p.title} loading="lazy" decoding="async" />
+                    {s.label && <span className="pd-cap mono">{s.label}</span>}
+                  </a>
+                );
+              })}
             </div>
           </Reveal>
         ) : (
