@@ -16,7 +16,7 @@ import { thumbSrcSet, thumbSrc, sizes } from '../../lib/img.js';
 export function ProjectDetailPage({ go, id }) {
   const { C } = useT();
   const u = C.ui;
-  const p = C.projects.find((x) => x.id === id);
+  const p = C.projects.find((x) => x.slug === id || x.id === id);
 
   if (!p) {
     return (

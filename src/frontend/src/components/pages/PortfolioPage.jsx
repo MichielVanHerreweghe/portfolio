@@ -5,6 +5,7 @@ import { Reveal, Kicker } from '../primitives.jsx';
 import { ContactFooter } from '../ContactFooter.jsx';
 import { useT } from '../../lib/i18n.jsx';
 import { srcSet, sizes } from '../../lib/img.js';
+import { pathFor, isPlainLeftClick } from '../../lib/routes.js';
 
 function PortfolioHero({ filter, setFilter }) {
   const { C } = useT();
@@ -35,12 +36,14 @@ function PortfolioHero({ filter, setFilter }) {
   );
 }
 
-function ProjectCard({ p, big }) {
+function ProjectCard({ p, big, go }) {
   const { C } = useT();
   const u = C.ui;
+  const href = pathFor("project", p.slug || p.id);
+  const onClick = (e) => { if (isPlainLeftClick(e)) { e.preventDefault(); go("project", p.slug || p.id); } };
   return (
     <Reveal>
-      <a href={"#/project/" + p.id} className="card proj-card" style={{ display: "block", overflow: "hidden", color: "var(--text)", height: "100%" }}>
+      <a href={href} onClick={onClick} className="card proj-card" style={{ display: "block", overflow: "hidden", color: "var(--text)", height: "100%" }}>
         <div style={{ position: "relative" }}>
           <image-slot id={"port-" + p.id} src={p.cover} srcset={srcSet(p.cover)} sizes={sizes(big ? 90 : 45)} style={{ width: "100%", height: big ? 420 : 260 }} shape="rect" placeholder={p.kind}></image-slot>
           <span className="mono proj-visit" style={{ position: "absolute", top: 14, right: 14, background: "var(--volt)", color: "#0B0B0C", fontSize: 12, fontWeight: 700, padding: "8px 12px", borderRadius: 3, display: "inline-flex", alignItems: "center", gap: 7, opacity: 0, transform: "translateY(-6px)", transition: "all .3s var(--ease)" }}>
@@ -80,9 +83,9 @@ export function PortfolioPage({ go }) {
     <div className="page">
       <PortfolioHero filter={filter} setFilter={setFilter} />
       <section className="wrap" style={{ padding: "30px 40px 80px" }}>
-        {featured && <div style={{ marginBottom: 20 }}><ProjectCard p={featured} big /></div>}
+        {featured && <div style={{ marginBottom: 20 }}><ProjectCard p={featured} big go={go} /></div>}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 20 }} className="port-grid">
-          {rest.map(p => <ProjectCard key={p.id} p={p} />)}
+          {rest.map(p => <ProjectCard key={p.id} p={p} go={go} />)}
         </div>
         {shown.length === 0 && (
           <div className="mono" style={{ textAlign: "center", padding: "80px 0", color: "var(--faint)" }}>// {u.noProjects} "{filter}"</div>

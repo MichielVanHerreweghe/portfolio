@@ -35,7 +35,7 @@ const NEUTRAL = {
     Data: ["PostgreSQL", "MySQL", "Microsoft SQLServer"],
   },
   projectMeta: [
-    { id: "p1", year: "2025", href: "https://www.tvijverhof.be/", featured: true, tags: ["Design", "Web"],
+    { id: "p1", slug: "t-vijverhof", year: "2025", href: "https://www.tvijverhof.be/", featured: true, tags: ["Design", "Web"],
       cover: "/projects/p1/cover.webp",
       shots: [
         { src: "/projects/p1/home.webp", label: "Home" },
@@ -46,7 +46,7 @@ const NEUTRAL = {
         { src: "/projects/p1/rouwmaaltijden.webp", label: "Memorial meals" },
         { src: "/projects/p1/contact.webp", label: "Reservation & contact" },
       ] },
-    { id: "p2", year: "2021", href: "https://www.uitvaartbegeleidingstefaan.be/", tags: ["Design", "Web"],
+    { id: "p2", slug: "uitvaartbegeleiding-stefaan", year: "2021", href: "https://www.uitvaartbegeleidingstefaan.be/", tags: ["Design", "Web"],
       cover: "/projects/p2/cover.webp",
       shots: [
         { src: "/projects/p2/home.webp", label: "Home" },
@@ -289,11 +289,14 @@ const LangContext = React.createContext({ lang: "en", setLang: () => {}, C: EN }
 export const useT = () => React.useContext(LangContext);
 
 export function LangProvider({ children }) {
-  const [lang, setLangState] = React.useState(() => {
-    if (typeof localStorage === "undefined") return "en";
+  // Always start from "en" so the server-rendered HTML and the first client
+  // render agree (no hydration mismatch). A returning visitor's saved language
+  // is applied in an effect right after mount.
+  const [lang, setLangState] = React.useState("en");
+  React.useEffect(() => {
     const saved = localStorage.getItem("mvh-lang");
-    return (saved && I18N[saved]) ? saved : "en";
-  });
+    if (saved && I18N[saved] && saved !== "en") setLangState(saved);
+  }, []);
   React.useEffect(() => {
     document.documentElement.lang = lang;
     localStorage.setItem("mvh-lang", lang);

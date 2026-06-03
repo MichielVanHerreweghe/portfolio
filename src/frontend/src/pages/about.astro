@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Site from '../components/App.jsx';
+import { I18N } from '../lib/i18n.jsx';
+
+const C = I18N.en;
+
+const title = 'About — Michiel Van Herreweghe';
+const description = C.ui.aboutP1;
+---
+
+<Layout title={title} description={description}>
+  <div id="root">
+    <Site client:load initialRoute="about" />
+  </div>
+</Layout>

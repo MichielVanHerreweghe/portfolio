@@ -27,7 +27,7 @@ function AboutHero() {
           </Reveal>
           <Reveal delay={270}>
             <div style={{ display: "flex", gap: 14, marginTop: 38, flexWrap: "wrap" }}>
-              <Button as="a" href={`Resume.html?lang=${lang}`} target="_blank" icon={<Icon.down />}>{u.downloadResume}</Button>
+              <Button as="a" href={`/Resume.html?lang=${lang}`} target="_blank" icon={<Icon.down />}>{u.downloadResume}</Button>
             </div>
           </Reveal>
         </div>
