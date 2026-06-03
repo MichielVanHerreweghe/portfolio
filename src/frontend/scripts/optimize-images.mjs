@@ -8,9 +8,18 @@
  *
  * Source of truth: image-sources/projects/<id>/*.png  (full-page captures,
  * NOT served — kept out of public/ so the multi-MB PNGs never reach the bundle).
- * Output:          public/projects/<id>/<name>-{480,768,1080}.webp + <name>.webp
  *
- * The fixed width set must stay in sync with WIDTHS in src/lib/img.js.
+ * Two output families per image (full-page captures are very tall, so a tile
+ * that rendered the whole page had to decode 6+ megapixels):
+ *   <name>-{480,768,1080}.webp + <name>.webp
+ *       Full-height responsive variants. Used for project covers and as the
+ *       "open original in a new tab" target on the detail gallery.
+ *   <name>-thumb-{480,768,1080,1440}.webp
+ *       Short top-crop previews (height capped to THUMB_SRC_H) for the gallery
+ *       grid — ~1MP instead of 6MP, so the grid paints fast. The hover reveal
+ *       pans within this preview; clicking still opens the full screenshot.
+ *
+ * The fixed width sets must stay in sync with src/lib/img.js.
  *
  * Run with:  npm run optimize:images        (skips images already up to date)
  *            npm run optimize:images -- --force   (re-encode everything)
@@ -34,6 +43,12 @@ const WIDTHS = [480, 768, 1080];
 const FULL_CAP = 1440; // capture width — never upscale past this
 const QUALITY = 80;
 
+// Gallery thumbnail widths (includes 1440 so full-width "wide" tiles stay sharp
+// on retina). Each is a top-crop of the page, height capped to THUMB_SRC_H
+// source px — at the 1440-wide capture, a 1080-wide thumb ends up ~1MP.
+const THUMB_WIDTHS = [480, 768, 1080, 1440];
+const THUMB_SRC_H = 1200;
+
 const FORCE = process.argv.includes('--force');
 
 async function listDirs(p) {
@@ -47,11 +62,14 @@ async function listDirs(p) {
 async function isFresh(srcPath, outDir, name) {
   if (FORCE) return false;
   try {
-    const [src, full] = await Promise.all([
+    // Check both families so adding the thumbnails to an already-generated
+    // tree still triggers a rebuild for them.
+    const [src, full, thumb] = await Promise.all([
       stat(srcPath),
       stat(join(outDir, `${name}.webp`)),
+      stat(join(outDir, `${name}-thumb-768.webp`)),
     ]);
-    return full.mtimeMs >= src.mtimeMs;
+    return full.mtimeMs >= src.mtimeMs && thumb.mtimeMs >= src.mtimeMs;
   } catch {
     return false;
   }
@@ -61,10 +79,11 @@ async function processFile(srcPath, outDir, name) {
   const input = sharp(srcPath, { failOn: 'error' });
   const meta = await input.metadata();
   const origW = meta.width || FULL_CAP;
+  const origH = meta.height || THUMB_SRC_H;
   const fullW = Math.min(origW, FULL_CAP);
 
   const jobs = [];
-  // Responsive variants — only downscale, never upscale.
+  // Full-height responsive variants — only downscale, never upscale.
   for (const w of WIDTHS) {
     if (w >= fullW) continue;
     jobs.push(
@@ -81,6 +100,20 @@ async function processFile(srcPath, outDir, name) {
       .webp({ quality: QUALITY })
       .toFile(join(outDir, `${name}.webp`))
   );
+
+  // Gallery thumbnails: crop the top of the page, then downscale by width.
+  // Short pages (height <= THUMB_SRC_H) are simply not cropped.
+  const cropH = Math.min(origH, THUMB_SRC_H);
+  for (const w of THUMB_WIDTHS) {
+    if (w > fullW) continue;
+    jobs.push(
+      sharp(srcPath)
+        .extract({ left: 0, top: 0, width: origW, height: cropH })
+        .resize({ width: w })
+        .webp({ quality: QUALITY })
+        .toFile(join(outDir, `${name}-thumb-${w}.webp`))
+    );
+  }
 
   await Promise.all(jobs);
   return { origW, fullW };
