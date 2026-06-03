@@ -225,7 +225,7 @@
 
   class ImageSlot extends HTMLElement {
     static get observedAttributes() {
-      return ['shape', 'radius', 'mask', 'fit', 'position', 'placeholder', 'src', 'id'];
+      return ['shape', 'radius', 'mask', 'fit', 'position', 'placeholder', 'src', 'srcset', 'sizes', 'id'];
     }
 
     constructor() {
@@ -621,6 +621,19 @@
           this._img.src = url;
           this._ghost.src = url;
         }
+        // Responsive candidates apply only to the author `src` — a user-dropped
+        // data URL is a single already-resized encode with no -<w> variants.
+        const ss = this._userUrl ? '' : (this.getAttribute('srcset') || '');
+        const sz = this._userUrl ? '' : (this.getAttribute('sizes') || '');
+        if ((this._img.getAttribute('srcset') || '') !== ss) {
+          if (ss) {
+            this._img.setAttribute('srcset', ss);
+            if (sz) this._img.setAttribute('sizes', sz); else this._img.removeAttribute('sizes');
+          } else {
+            this._img.removeAttribute('srcset');
+            this._img.removeAttribute('sizes');
+          }
+        }
         this._img.style.display = 'block';
         this._empty.style.display = 'none';
         this.setAttribute('data-filled', '');
@@ -629,6 +642,8 @@
       } else {
         this._img.style.display = 'none';
         this._img.removeAttribute('src');
+        this._img.removeAttribute('srcset');
+        this._img.removeAttribute('sizes');
         this._ghost.removeAttribute('src');
         this._empty.style.display = 'flex';
         this.removeAttribute('data-filled');
