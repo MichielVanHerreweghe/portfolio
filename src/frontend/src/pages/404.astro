@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Page not found — Michiel Van Herreweghe" noindex={true}>
+  <main style="min-height: 70vh; display: grid; place-items: center; text-align: center; padding: 120px 24px;">
+    <div>
+      <p class="mono" style="color: var(--volt-text); letter-spacing: 0.1em;">404</p>
+      <h1 class="display" style="font-size: clamp(40px, 7vw, 80px); margin-top: 18px;">Page not found</h1>
+      <p style="color: var(--muted); margin-top: 18px; font-size: 18px;">
+        The page you’re looking for doesn’t exist or has moved.
+      </p>
+      <a href="/" class="btn btn-primary" style="display: inline-flex; margin-top: 32px; text-decoration: none;">
+        Back home
+      </a>
+    </div>
+  </main>
+</Layout>

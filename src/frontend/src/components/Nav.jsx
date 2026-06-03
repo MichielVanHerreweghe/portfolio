@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Icon } from './icons.jsx';
 import { Button } from './primitives.jsx';
 import { useT, LANGS } from '../lib/i18n.jsx';
+import { pathFor, isPlainLeftClick } from '../lib/routes.js';
 
 export function Nav({ route, go, theme, toggleTheme }) {
   const { lang, setLang, C } = useT();
@@ -33,6 +34,9 @@ export function Nav({ route, go, theme, toggleTheme }) {
 
   const links = [["home", u.navHome], ["portfolio", u.navWork], ["about", u.navAbout]];
   const nav = (id) => { setOpen(false); go(id); };
+  // Render nav items as real <a href> (crawlable, work without JS) but
+  // intercept plain left-clicks so client-side navigation keeps the SPA feel.
+  const navClick = (id) => (e) => { if (isPlainLeftClick(e)) { e.preventDefault(); nav(id); } };
   const cur = LANGS.find(l => l.code === lang) || LANGS[0];
   const pickLang = (code) => { setLang(code); setLangOpen(false); };
 
@@ -40,18 +44,18 @@ export function Nav({ route, go, theme, toggleTheme }) {
     <nav className={"nav" + (scrolled ? " scrolled" : "")}>
       <div className="nav-progress" style={{ width: progress + "%" }} />
       <div className="nav-inner">
-        <button className="brand" onClick={() => nav("home")} aria-label="Michiel Van Herreweghe — home">
+        <a className="brand" href={pathFor("home")} onClick={navClick("home")} aria-label="Michiel Van Herreweghe — home">
           <span className="monogram">M</span>
           <span className="wordmark">
             <b><span className="wm-full">Michiel Van&nbsp;Herreweghe</span><span className="wm-short">Michiel V.H.</span></b>
             <small>{u.tagline}</small>
           </span>
-        </button>
+        </a>
 
         <div className="nav-right">
           <div className="nav-links desktop-only">
             {links.map(([id, label]) => (
-              <button key={id} className={"nav-link" + (route === id ? " active" : "")} onClick={() => nav(id)}>{label}</button>
+              <a key={id} href={pathFor(id)} className={"nav-link" + (route === id ? " active" : "")} onClick={navClick(id)}>{label}</a>
             ))}
           </div>
           <span className="nav-divider desktop-only" />
@@ -74,7 +78,7 @@ export function Nav({ route, go, theme, toggleTheme }) {
             <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme" aria-label="Toggle theme">
               {theme === "dark" ? <Icon.sun /> : <Icon.moon />}
             </button>
-            <Button as="a" href={`Resume.html?lang=${lang}`} target="_blank" variant="ghost" className="desktop-only" icon={<Icon.down />} style={{ padding: "11px 18px", fontSize: 14.5 }}>{u.resume}</Button>
+            <Button as="a" href={`/Resume.html?lang=${lang}`} target="_blank" variant="ghost" className="desktop-only" icon={<Icon.down />} style={{ padding: "11px 18px", fontSize: 14.5 }}>{u.resume}</Button>
             <Button onClick={() => nav("contact")} className="desktop-only" icon={<Icon.arrow />} style={{ padding: "11px 20px", fontSize: 14.5 }}>{u.getInTouch}</Button>
             <button className="nav-burger" onClick={() => setOpen(o => !o)} aria-label="Menu" aria-expanded={open}>
               {open
@@ -89,9 +93,9 @@ export function Nav({ route, go, theme, toggleTheme }) {
       <div className={"mobile-panel" + (open ? " open" : "")}>
         <div className="mp-inner">
           {links.map(([id, label]) => (
-            <button key={id} className={"mp-link" + (route === id ? " active" : "")} onClick={() => nav(id)}>
+            <a key={id} href={pathFor(id)} className={"mp-link" + (route === id ? " active" : "")} onClick={navClick(id)}>
               {label} {route === id && <span className="mono" style={{ fontSize: 13, color: "var(--volt-text)" }}>● {u.now}</span>}
-            </button>
+            </a>
           ))}
           <button className="mp-link" onClick={() => nav("contact")}>{u.navContact} <Icon.arrow /></button>
           {/* language pills */}
@@ -105,7 +109,7 @@ export function Nav({ route, go, theme, toggleTheme }) {
             ))}
           </div>
           <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-            <Button as="a" href={`Resume.html?lang=${lang}`} target="_blank" icon={<Icon.down />} style={{ flex: 1, justifyContent: "center" }}>{u.resume}</Button>
+            <Button as="a" href={`/Resume.html?lang=${lang}`} target="_blank" icon={<Icon.down />} style={{ flex: 1, justifyContent: "center" }}>{u.resume}</Button>
             <Button onClick={toggleTheme} variant="ghost" style={{ justifyContent: "center" }}>
               {theme === "dark" ? <Icon.sun /> : <Icon.moon />} {theme === "dark" ? "Light" : "Dark"}
             </Button>

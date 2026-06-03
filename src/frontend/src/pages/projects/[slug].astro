@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Site from '../../components/App.jsx';
+import { I18N } from '../../lib/i18n.jsx';
+
+export function getStaticPaths() {
+  return I18N.en.projects.map((p) => ({
+    params: { slug: p.slug || p.id },
+    props: { project: p },
+  }));
+}
+
+const { project } = Astro.props;
+const { slug } = Astro.params;
+const site = (Astro.site ?? new URL('https://nomaddigital.dev')).href.replace(/\/$/, '');
+
+const title = `${project.title} — ${project.kind} by Michiel Van Herreweghe`;
+const description = project.desc;
+const url = `${site}/projects/${slug}`;
+
+const projectLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: project.title,
+  description,
+  url,
+  image: project.cover ? new URL(project.cover, site).href : undefined,
+  dateCreated: project.year,
+  creator: { '@type': 'Person', name: I18N.en.name, url: site + '/' },
+  ...(project.href && project.href !== '#' ? { sameAs: project.href } : {}),
+};
+---
+
+<Layout
+  title={title}
+  description={description}
+  image={project.cover}
+  type="article"
+  jsonLd={projectLd}
+>
+  <div id="root">
+    <Site client:load initialRoute="project" initialParam={slug} />
+  </div>
+</Layout>

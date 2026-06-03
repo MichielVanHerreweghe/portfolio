@@ -4,12 +4,30 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /** Path to a social-share image in /public (1200×630 recommended). */
+  image?: string;
+  /** og:type — "website" for pages, "article" for project case-studies. */
+  type?: string;
+  /** Discourage indexing of this page (e.g. utility pages). */
+  noindex?: boolean;
+  /** One or more schema.org JSON-LD objects to embed. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title = 'Michiel Van Herreweghe — DevOps & Software Engineer',
   description = 'DevOps & Software Engineer building resilient pipelines, clean infrastructure, and software that ships.',
+  image = '/og.png',
+  type = 'website',
+  noindex = false,
+  jsonLd,
 } = Astro.props;
+
+// Astro.site is set in astro.config.mjs. Fall back gracefully if it's missing.
+const site = Astro.site ?? new URL('https://nomaddigital.dev');
+const canonical = new URL(Astro.url.pathname, site).href;
+const imageUrl = new URL(image, site).href;
+const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!DOCTYPE html>
@@ -17,14 +35,45 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex
+      ? <meta name="robots" content="noindex, nofollow" />
+      : <meta name="robots" content="index, follow, max-image-preview:large" />}
+    <meta name="author" content="Michiel Van Herreweghe" />
+    <meta name="theme-color" content="#0B0B0C" />
+
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Michiel Van Herreweghe" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:locale" content="en" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <title>{title}</title>
+
+    {jsonLdBlocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
+
     {/* Apply persisted theme + language before paint to avoid a flash. */}
     <script is:inline>
       (function () {

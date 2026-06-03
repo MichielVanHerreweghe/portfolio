@@ -6,27 +6,20 @@ import { AboutPage } from './pages/AboutPage.jsx';
 import { PortfolioPage } from './pages/PortfolioPage.jsx';
 import { ProjectDetailPage } from './pages/ProjectDetailPage.jsx';
 import { LangProvider } from '../lib/i18n.jsx';
+import { ROUTES, pathFor, parseLocation } from '../lib/routes.js';
 
-const ROUTES = ["home", "portfolio", "about"];
-
-function parseHash() {
-  if (typeof location === "undefined") return { route: "home", param: null };
-  const h = (location.hash || "").replace(/^#\/?/, "").trim();
-  const [base, param] = h.split("/");
-  if (base === "project" && param) return { route: "project", param };
-  return { route: ROUTES.includes(base) ? base : "home", param: null };
-}
-
-function App() {
+function App({ initialRoute, initialParam }) {
   const [theme, setTheme] = useState(() => {
     if (typeof localStorage === "undefined") return "dark";
     return localStorage.getItem("mvh-theme") || "dark";
   });
-  const init = parseHash();
-  const [route, setRoute] = useState(init.route);
-  const [param, setParam] = useState(init.param);
-  const [display, setDisplay] = useState(init.route);   // page actually mounted
-  const [displayParam, setDisplayParam] = useState(init.param);
+  // Initial route comes from the Astro page that server-rendered this app, so
+  // the SSR HTML and first client render agree. Back/forward then re-derives it
+  // from the URL via popstate.
+  const [route, setRoute] = useState(initialRoute);
+  const [param, setParam] = useState(initialParam);
+  const [display, setDisplay] = useState(initialRoute);   // page actually mounted
+  const [displayParam, setDisplayParam] = useState(initialParam);
   const [exiting, setExiting] = useState(false);
 
   // apply theme
@@ -35,11 +28,11 @@ function App() {
     localStorage.setItem("mvh-theme", theme);
   }, [theme]);
 
-  // react to hash changes (back/forward)
+  // react to browser back/forward
   useEffect(() => {
-    const onHash = () => { const r = parseHash(); setRoute(r.route); setParam(r.param); };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const onPop = () => { const r = parseLocation(location.pathname); setRoute(r.route); setParam(r.param); };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   // animate page swap when route changes
@@ -68,7 +61,7 @@ function App() {
       return;
     }
     if (target === "project" && id) {
-      location.hash = "/project/" + id;
+      history.pushState({}, "", pathFor("project", id));
       setRoute("project"); setParam(id);
       return;
     }
@@ -76,7 +69,7 @@ function App() {
       if (target === route) window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    location.hash = "/" + target;
+    history.pushState({}, "", pathFor(target));
     setRoute(target); setParam(null);
   };
 
@@ -98,10 +91,10 @@ function App() {
   );
 }
 
-export default function Site() {
+export default function Site({ initialRoute = "home", initialParam = null }) {
   return (
     <LangProvider>
-      <App />
+      <App initialRoute={initialRoute} initialParam={initialParam} />
     </LangProvider>
   );
 }

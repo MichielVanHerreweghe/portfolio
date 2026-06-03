@@ -26,7 +26,7 @@ function HomeHero({ go }) {
             <Reveal delay={220}>
               <div style={{ display: "flex", gap: 14, marginTop: 42, flexWrap: "wrap" }}>
                 <Button onClick={() => go("portfolio")} icon={<Icon.arrow />}>{u.viewWork}</Button>
-                <Button as="a" href={`Resume.html?lang=${lang}`} target="_blank" variant="ghost" icon={<Icon.down />}>{u.downloadCV}</Button>
+                <Button as="a" href={`/Resume.html?lang=${lang}`} target="_blank" variant="ghost" icon={<Icon.down />}>{u.downloadCV}</Button>
               </div>
             </Reveal>
           </div>
