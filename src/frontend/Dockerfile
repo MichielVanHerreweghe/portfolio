@@ -18,4 +18,6 @@ COPY --chown=nginx:nginx nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
 
+USER nginx
+
 EXPOSE 8080
