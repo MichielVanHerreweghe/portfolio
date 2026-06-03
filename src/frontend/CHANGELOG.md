@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v1.0.2...portfolio-frontend-v1.0.3) (2026-06-03)
+
+
+### Bug Fixes
+
+* slow project image loadtimes ([#9](https://github.com/MichielVanHerreweghe/portfolio/issues/9)) ([b06ebc4](https://github.com/MichielVanHerreweghe/portfolio/commit/b06ebc458444a0c020c2a6fd0317cd5d04b4cf39))
+
 ## [1.0.2](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v1.0.1...portfolio-frontend-v1.0.2) (2026-06-03)
 
 
