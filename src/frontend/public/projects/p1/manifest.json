@@ -1,0 +1,94 @@
+{
+  "id": "p1",
+  "entry": "https://www.tvijverhof.be/",
+  "capturedWidth": 1440,
+  "cover": "/projects/p1/cover.png",
+  "pages": [
+    {
+      "url": "https://www.tvijverhof.be/",
+      "slug": "home",
+      "title": "'t Vijverhof Mere | Restaurant",
+      "heading": "'t Vijverhof",
+      "description": "",
+      "headings": [
+        "'t Vijverhof"
+      ],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie 't Vijverhof Een laatste hoofdstuk voor ‘t Vijverhof Na vele mooie jaren komt er binnenkort een einde aan een bijzonder hoofdstuk voor ’t Vijverhof. Door de verkoop van het domein en de geplande herontwikkeling van de site hebben we beslist om de restaurantactiviteiten in hun huidige vorm stop te zetten. Onze laatste service zal plaatsvinden op maandag 4 mei. Wat ooit begon als een passieproject groeide uit tot een plek waar mensen samenkwamen om te geni",
+      "full": "/projects/p1/home.png",
+      "mobile": null,
+      "isEntry": true
+    },
+    {
+      "url": "https://www.tvijverhof.be/menu",
+      "slug": "menu",
+      "title": "Menu | 't Vijverhof Mere",
+      "heading": "",
+      "description": "",
+      "headings": [],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie Menu  +32 (0)53 80 08 13  tvijverhof@outlook.be  Industrieweg 2, 9420 Erpe-Mere  Volg ons op Facebook  Volg ons op Instagram",
+      "full": "/projects/p1/menu.png",
+      "mobile": null,
+      "isEntry": false
+    },
+    {
+      "url": "https://www.tvijverhof.be/wijnen",
+      "slug": "wijnen",
+      "title": "Wijnen | 't Vijverhof Mere",
+      "heading": "",
+      "description": "",
+      "headings": [],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie Wijnen  +32 (0)53 80 08 13  tvijverhof@outlook.be  Industrieweg 2, 9420 Erpe-Mere  Volg ons op Facebook  Volg ons op Instagram",
+      "full": "/projects/p1/wijnen.png",
+      "mobile": null,
+      "isEntry": false
+    },
+    {
+      "url": "https://www.tvijverhof.be/dessert",
+      "slug": "dessert",
+      "title": "Dessert | 't Vijverhof Mere",
+      "heading": "",
+      "description": "",
+      "headings": [],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie Dessert  +32 (0)53 80 08 13  tvijverhof@outlook.be  Industrieweg 2, 9420 Erpe-Mere  Volg ons op Facebook  Volg ons op Instagram",
+      "full": "/projects/p1/dessert.png",
+      "mobile": null,
+      "isEntry": false
+    },
+    {
+      "url": "https://www.tvijverhof.be/gallerij",
+      "slug": "gallerij",
+      "title": "Gallerij | 't Vijverhof Mere",
+      "heading": "",
+      "description": "",
+      "headings": [],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie Gallerij  +32 (0)53 80 08 13  tvijverhof@outlook.be  Industrieweg 2, 9420 Erpe-Mere  Volg ons op Facebook  Volg ons op Instagram",
+      "full": "/projects/p1/gallerij.png",
+      "mobile": null,
+      "isEntry": false
+    },
+    {
+      "url": "https://www.tvijverhof.be/rouwmaaltijden",
+      "slug": "rouwmaaltijden",
+      "title": "Rouwmaaltijden | 't Vijverhof Mere",
+      "heading": "",
+      "description": "",
+      "headings": [],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie Rouwmaaltijden / Koffietafels Bij ons kunt u in een rustige, serene omgeving een rouwmaaltijd of koffietafel organiseren. Dit is mogelijk op dinsdag, woensdag, donderdag of zaterdag in de middag, voor groepen vanaf 20 personen. Wij staan u graag bij in deze moeilijke tijd en bieden flexibele opties die volledig afgestemd kunnen worden op uw wensen. Voor reserveringen of meer informatie kunt u contact met ons opnemen via e-mail of telefoon. Samen bespreke",
+      "full": "/projects/p1/rouwmaaltijden.png",
+      "mobile": null,
+      "isEntry": false
+    },
+    {
+      "url": "https://www.tvijverhof.be/contact",
+      "slug": "contact",
+      "title": "Reservatie en contact | 't Vijverhof Mere",
+      "heading": "",
+      "description": "",
+      "headings": [],
+      "text": "Laatste weken ‘t Vijverhof – reserveer nog een laatste keer voor 4 mei! Menu Wijnen Dessert Gallerij Rouwmaaltijden / Koffietafels Reservatie RESERVATIE Verlofperiodes 2026: Maandag 6 april  +32 (0)53 80 08 13  tvijverhof@outlook.be  Industrieweg 2, 9420 Erpe-Mere  Volg ons op Facebook  Volg ons op Instagram",
+      "full": "/projects/p1/contact.png",
+      "mobile": null,
+      "isEntry": false
+    }
+  ]
+}

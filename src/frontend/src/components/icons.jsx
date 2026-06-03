@@ -1,0 +1,15 @@
+/* icons.jsx — inline SVG icon set */
+export const Icon = {
+  arrow: (p) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" {...p}><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  arrowUR: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  down: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><path d="M12 5v14M6 13l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  sun: (p) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" {...p}><circle cx="12" cy="12" r="4.5" stroke="currentColor" strokeWidth="2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>),
+  moon: (p) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" {...p}><path d="M20 14.5A8 8 0 119.5 4a6.5 6.5 0 0010.5 10.5z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/></svg>),
+  globe: (p) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" {...p}><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18" stroke="currentColor" strokeWidth="1.8"/></svg>),
+  check: (p) => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" {...p}><path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  book: (p) => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" {...p}><path d="M4 5.5A1.5 1.5 0 015.5 4H11v15H5.5A1.5 1.5 0 014 17.5v-12zM20 5.5A1.5 1.5 0 0018.5 4H13v15h5.5a1.5 1.5 0 001.5-1.5v-12z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>),
+  mountain: (p) => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" {...p}><path d="M3 19l6-11 3.5 6 2-3.5L21 19H3z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>),
+  board: (p) => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" {...p}><rect x="9.5" y="2.5" width="5" height="19" rx="2.5" transform="rotate(34 12 12)" stroke="currentColor" strokeWidth="1.7"/><path d="M9 9.5l1.6 1M13.4 13.5l1.6 1" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>),
+  film: (p) => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" {...p}><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" strokeWidth="1.7"/><path d="M8 5.5v13M16 5.5v13M3.5 12h17" stroke="currentColor" strokeWidth="1.7"/></svg>),
+  flame: (p) => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" {...p}><path d="M12 3c.6 2.6 2.6 3.9 3.4 5.6.7 1.4.8 2.9.2 4.3A4.6 4.6 0 117.4 9.2c.4 1 1.2 1.7 2.1 1.7 1.2 0 1.6-1.2 1.3-2.6C10.2 6.5 10.7 4.4 12 3z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>),
+};

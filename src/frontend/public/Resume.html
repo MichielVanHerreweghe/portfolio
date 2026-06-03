@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Michiel Van Herreweghe — Résumé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --volt: #FFD000; --ink: #15140F; --muted: #5a594f; --faint: #8a887d; --line: #e4e2d8; }
+  body { font-family: 'Space Grotesk', sans-serif; background: #d8d7d0; color: var(--ink); -webkit-font-smoothing: antialiased; padding: 36px 16px; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .toolbar { max-width: 820px; margin: 0 auto 22px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
+  .toolbar a, .toolbar button { font-family: inherit; font-weight: 600; font-size: 15px; border: none; border-radius: 3px; padding: 12px 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
+  .btn-y { background: var(--volt); color: #0B0B0C; }
+  .btn-g { background: #fff; color: var(--ink); border: 1px solid #c9c7bd; }
+  .toolbar .hint { font-size: 13px; color: #6b6a60; flex: 1 1 120px; min-width: 0; }
+  .lang-switch { display: inline-flex; flex: 0 0 auto; gap: 2px; background: #fff; border: 1px solid #c9c7bd; border-radius: 3px; overflow: hidden; }
+  .lang-switch button { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 12.5px; letter-spacing: 0.06em; padding: 10px 12px; border-radius: 0; background: #fff; color: var(--muted); }
+  .lang-switch button[aria-current="true"] { background: var(--volt); color: #0B0B0C; }
+
+  .sheet { max-width: 820px; margin: 0 auto; background: #fff; box-shadow: 0 30px 70px -30px rgba(0,0,0,0.4); padding: 56px 60px; }
+
+  header.r-head { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; border-bottom: 3px solid var(--ink); padding-bottom: 24px; }
+  .r-name { font-size: 46px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; }
+  .r-name .hl { background: var(--volt); padding: 0 6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .r-role { font-size: 16px; color: var(--muted); margin-top: 12px; font-weight: 500; }
+  .r-contact { text-align: right; font-size: 13px; line-height: 1.9; color: var(--muted); }
+  .r-contact a { color: var(--ink); text-decoration: none; }
+
+  .r-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+  section.block { padding-top: 28px; }
+  .block h2 { font-size: 13px; letter-spacing: 0.18em; font-family: 'JetBrains Mono', monospace; color: var(--ink); text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .block h2::before { content: ""; width: 22px; height: 2px; background: var(--volt); }
+
+  .summary { font-size: 15.5px; line-height: 1.6; color: var(--muted); max-width: 64ch; }
+
+  .xp { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .xp:first-of-type { border-top: none; }
+  .xp .when { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--faint); padding-top: 3px; }
+  .xp h3 { font-size: 18px; }
+  .xp .org { color: #b08600; font-weight: 600; font-size: 14px; margin-top: 3px; }
+  .xp p { color: var(--muted); font-size: 14px; line-height: 1.55; margin-top: 8px; }
+
+  .skills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 36px; }
+  .skill-row { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .skill-row .g { font-weight: 600; }
+  .skill-row .v { color: var(--muted); text-align: right; }
+
+  .edu { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+  .edu:first-of-type { border-top: none; }
+  .edu .when { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--faint); }
+
+  @media print {
+    @page { margin: 14mm; size: A4; }
+    body { background: #fff; padding: 0; }
+    .toolbar { display: none; }
+    .sheet { box-shadow: none; max-width: 100%; padding: 0; }
+    a { color: var(--ink) !important; }
+  }
+  @media (max-width: 620px) {
+    .sheet { padding: 34px 26px; }
+    header.r-head { grid-template-columns: 1fr; }
+    .r-contact { text-align: left; }
+    .xp, .skills { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a class="btn-g" id="r-back" href="/">← Back to site</a>
+    <span class="hint" id="r-tip"></span>
+    <div class="lang-switch" id="r-langs"></div>
+    <button class="btn-y" id="r-download" onclick="window.print()"></button>
+  </div>
+
+  <div class="sheet">
+    <header class="r-head">
+      <div>
+        <div class="r-name">Michiel <span class="hl">Van Herreweghe</span></div>
+        <div class="r-role" id="r-role"></div>
+      </div>
+      <div class="r-contact" id="r-contact"></div>
+    </header>
+    <div class="r-grid" id="r-grid"></div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Résumé content — mirrors the site's i18n data (EN / NL / FR).
+       Language is chosen from ?lang= (falls back to en); the in-page
+       switcher updates the URL so the chosen version is shareable.
+       Keep this in sync with src/lib/i18n.jsx.
+       ============================================================ */
+
+    // language-neutral data
+    var CONTACT = {
+      email: "michiel.vanherreweghe@outlook.com",
+      emailLabel: "michiel.vanherreweghe@outlook.com",
+      linkedin: { href: "https://linkedin.com/in/michiel-van-herreweghe-0ba4b71a7", label: "linkedin.com/in/michiel-van-herreweghe" },
+      github:   { href: "https://github.com/michielvanherreweghe", label: "github.com/michielvanherreweghe" }
+    };
+    var SKILL_VALUES = {
+      infra: "Kubernetes, Docker, Terraform, Ansible, Helm",
+      cloud: "AWS, Azure",
+      cicd:  "GitHub Actions, Azure DevOps, ArgoCD",
+      langs: ".NET, React",
+      obs:   "Prometheus, Grafana, Loki, Tempo, OpenTelemetry",
+      data:  "PostgreSQL, MySQL, Microsoft SQL Server"
+    };
+    var CERTS = "GitHub Foundations · CKAD";
+    var EXP_META = [
+      { when: "2026 — Present", org: "Axxit" },
+      { when: "2025 — 2026", org: "Tomorrowland" },
+      { when: "2024 — 2025", org: "CloudFuel" },
+      { when: "2023 — 2024", org: "Inetum-RealDolmen" }
+    ];
+
+    var I18N = {
+      en: {
+        htmlLang: "en", docTitle: "Michiel Van Herreweghe — Résumé",
+        back: "← Back to site",
+        tip: "Tip: in the print dialog, choose “Save as PDF”.",
+        download: "Download PDF ↓",
+        role: "DevOps & Software Engineer · Belgium",
+        sections: { summary: "Summary", experience: "Experience", skills: "Skills", education: "Education" },
+        skillLabels: { infra: "Infrastructure", cloud: "Cloud", cicd: "CI/CD", langs: "Languages", obs: "Observability", data: "Data" },
+        summary: "DevOps & Software Engineer based in Belgium, sitting between infrastructure and product — building the pipelines and platforms that let teams ship fast without breaking things. I care about clean automation, observable systems, and code the next person can actually read.",
+        experience: [
+          { role: "Medior Software Engineer", body: "Building and shipping .NET and React applications on Azure, with infrastructure managed as code in Terraform and delivery through GitHub." },
+          { role: "DevOps Engineer", body: "Ran workloads on AWS and Kubernetes, with GitOps delivery via ArgoCD and infrastructure provisioned as code in Terraform." },
+          { role: "DevOps Engineer", body: "Containerised .NET services with Docker and Kubernetes on Azure, automating provisioning with Terraform and deployments with ArgoCD." },
+          { role: "Junior Cloud Application & Platform Engineer", body: "Developed .NET applications and platform tooling on Azure, with containerised workloads and CI/CD pipelines in Azure DevOps." }
+        ],
+        education: [
+          { title: "Applied Computer Science", org: "HoGent, Belgium", when: "2020 — 2023" },
+          { title: "Information Management and Security", org: "Thomas More, Belgium", when: "2019 — 2020" }
+        ],
+        certsLabel: "Certifications"
+      },
+      nl: {
+        htmlLang: "nl", docTitle: "Michiel Van Herreweghe — CV",
+        back: "← Terug naar site",
+        tip: "Tip: kies “Opslaan als pdf” in het printvenster.",
+        download: "Download pdf ↓",
+        role: "DevOps & Software Engineer · België",
+        sections: { summary: "Samenvatting", experience: "Ervaring", skills: "Vaardigheden", education: "Opleiding" },
+        skillLabels: { infra: "Infrastructuur", cloud: "Cloud", cicd: "CI/CD", langs: "Talen", obs: "Observability", data: "Data" },
+        summary: "DevOps & Software Engineer uit België die tussen infrastructuur en product in staat — en de pipelines en platformen bouwt waarmee teams snel kunnen leveren zonder dingen kapot te maken. Ik geef om propere automatisering, observeerbare systemen en code die de volgende persoon ook echt kan lezen.",
+        experience: [
+          { role: "Medior Software Engineer", body: "Bouwt en levert .NET- en React-applicaties op Azure, met infrastructuur als code in Terraform en delivery via GitHub." },
+          { role: "DevOps Engineer", body: "Beheerde workloads op AWS en Kubernetes, met GitOps-delivery via ArgoCD en infrastructuur als code in Terraform." },
+          { role: "DevOps Engineer", body: "Containeriseerde .NET-services met Docker en Kubernetes op Azure, met provisioning via Terraform en deployments via ArgoCD." },
+          { role: "Junior Cloud Application & Platform Engineer", body: "Ontwikkelde .NET-applicaties en platformtooling op Azure, met gecontaineriseerde workloads en CI/CD-pipelines in Azure DevOps." }
+        ],
+        education: [
+          { title: "Toegepaste Informatica", org: "HoGent, België", when: "2020 — 2023" },
+          { title: "Information Management and Security", org: "Thomas More, België", when: "2019 — 2020" }
+        ],
+        certsLabel: "Certificaten"
+      },
+      fr: {
+        htmlLang: "fr", docTitle: "Michiel Van Herreweghe — CV",
+        back: "← Retour au site",
+        tip: "Astuce : choisissez « Enregistrer en PDF » dans la boîte d'impression.",
+        download: "Télécharger le PDF ↓",
+        role: "DevOps & Software Engineer · Belgique",
+        sections: { summary: "Profil", experience: "Expérience", skills: "Compétences", education: "Formation" },
+        skillLabels: { infra: "Infrastructure", cloud: "Cloud", cicd: "CI/CD", langs: "Langages", obs: "Observabilité", data: "Données" },
+        summary: "DevOps & Software Engineer basé en Belgique, entre l'infrastructure et le produit — je construis les pipelines et plateformes qui permettent aux équipes de livrer vite sans rien casser. J'attache de l'importance à une automatisation propre, à des systèmes observables et à du code que la personne suivante peut vraiment lire.",
+        experience: [
+          { role: "Medior Software Engineer", body: "Conçoit et livre des applications .NET et React sur Azure, avec une infrastructure en tant que code dans Terraform et une livraison via GitHub." },
+          { role: "DevOps Engineer", body: "Gestion des workloads sur AWS et Kubernetes, avec livraison GitOps via ArgoCD et infrastructure provisionnée en tant que code dans Terraform." },
+          { role: "DevOps Engineer", body: "Conteneurisation de services .NET avec Docker et Kubernetes sur Azure, provisionnement via Terraform et déploiements via ArgoCD." },
+          { role: "Junior Cloud Application & Platform Engineer", body: "Développement d'applications .NET et d'outils de plateforme sur Azure, avec des workloads conteneurisés et des pipelines CI/CD dans Azure DevOps." }
+        ],
+        education: [
+          { title: "Informatique appliquée", org: "HoGent, Belgique", when: "2020 — 2023" },
+          { title: "Information Management and Security", org: "Thomas More, Belgique", when: "2019 — 2020" }
+        ],
+        certsLabel: "Certifications"
+      }
+    };
+
+    var ORDER = ["en", "nl", "fr"];
+    var SHORT = { en: "EN", nl: "NL", fr: "FR" };
+
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function pickLang() {
+      var q = new URLSearchParams(window.location.search).get("lang");
+      if (q && I18N[q]) return q;
+      return "en";
+    }
+
+    function render(lang) {
+      var t = I18N[lang];
+      document.documentElement.lang = t.htmlLang;
+      document.title = t.docTitle;
+
+      document.getElementById("r-back").textContent = t.back;
+      document.getElementById("r-tip").textContent = t.tip;
+      document.getElementById("r-download").textContent = t.download;
+      document.getElementById("r-role").textContent = t.role;
+
+      document.getElementById("r-contact").innerHTML =
+        '<a href="mailto:' + esc(CONTACT.email) + '">' + esc(CONTACT.emailLabel) + '</a><br />' +
+        '<a href="' + esc(CONTACT.linkedin.href) + '">' + esc(CONTACT.linkedin.label) + '</a><br />' +
+        '<a href="' + esc(CONTACT.github.href) + '">' + esc(CONTACT.github.label) + '</a>';
+
+      // language switcher
+      var ls = document.getElementById("r-langs");
+      ls.innerHTML = "";
+      ORDER.forEach(function (code) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = SHORT[code];
+        if (code === lang) b.setAttribute("aria-current", "true");
+        b.addEventListener("click", function () { switchLang(code); });
+        ls.appendChild(b);
+      });
+
+      var xp = t.experience.map(function (e, i) {
+        var m = EXP_META[i];
+        return '' +
+          '<div class="xp">' +
+            '<div class="when">' + esc(m.when) + '</div>' +
+            '<div>' +
+              '<h3>' + esc(e.role) + '</h3>' +
+              '<div class="org">' + esc(m.org) + '</div>' +
+              '<p>' + esc(e.body) + '</p>' +
+            '</div>' +
+          '</div>';
+      }).join("");
+
+      var sk = t.skillLabels;
+      var skills = '' +
+        skillRow(sk.infra, SKILL_VALUES.infra) +
+        skillRow(sk.cloud, SKILL_VALUES.cloud) +
+        skillRow(sk.cicd, SKILL_VALUES.cicd) +
+        skillRow(sk.langs, SKILL_VALUES.langs) +
+        skillRow(sk.obs, SKILL_VALUES.obs) +
+        skillRow(sk.data, SKILL_VALUES.data);
+
+      var edu = t.education.map(function (e) {
+        return '<div class="edu"><span><strong>' + esc(e.title) + '</strong> — ' + esc(e.org) + '</span><span class="when">' + esc(e.when) + '</span></div>';
+      }).join("");
+      edu += '<div class="edu"><span><strong>' + esc(t.certsLabel) + '</strong> — ' + esc(CERTS) + '</span><span class="when"></span></div>';
+
+      document.getElementById("r-grid").innerHTML = '' +
+        '<section class="block"><h2>' + esc(t.sections.summary) + '</h2><p class="summary">' + esc(t.summary) + '</p></section>' +
+        '<section class="block"><h2>' + esc(t.sections.experience) + '</h2>' + xp + '</section>' +
+        '<section class="block"><h2>' + esc(t.sections.skills) + '</h2><div class="skills">' + skills + '</div></section>' +
+        '<section class="block"><h2>' + esc(t.sections.education) + '</h2>' + edu + '</section>';
+    }
+
+    function skillRow(g, v) {
+      return '<div class="skill-row"><span class="g">' + esc(g) + '</span><span class="v">' + esc(v) + '</span></div>';
+    }
+
+    function switchLang(lang) {
+      var url = new URL(window.location.href);
+      url.searchParams.set("lang", lang);
+      window.history.replaceState(null, "", url);
+      render(lang);
+    }
+
+    render(pickLang());
+  </script>
+</body>
+</html>
