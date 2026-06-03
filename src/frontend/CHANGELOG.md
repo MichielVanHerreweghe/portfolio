@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v1.0.3...portfolio-frontend-v1.1.0) (2026-06-03)
+
+
+### Features
+
+* seo optimization ([#11](https://github.com/MichielVanHerreweghe/portfolio/issues/11)) ([0f8cf60](https://github.com/MichielVanHerreweghe/portfolio/commit/0f8cf60d468f16fa408b3c1e4c4047181bcdfd3b))
+
 ## [1.0.3](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v1.0.2...portfolio-frontend-v1.0.3) (2026-06-03)
 
 
