@@ -1,0 +1,196 @@
+# Default values for the portfolio chart.
+# This is a YAML-formatted file. Values are merged onto these defaults at install/upgrade.
+
+# -- Number of Pod replicas. Ignored when autoscaling.enabled is true.
+replicaCount: 2
+
+image:
+  # -- Container image repository.
+  repository: ghcr.io/michielvanherreweghe/portfolio-frontend
+  # -- Image pull policy.
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to the chart's appVersion when left empty.
+  tag: ""
+
+# -- Image pull secrets for private registries (e.g. GHCR with a PAT).
+imagePullSecrets: []
+#  - name: ghcr-credentials
+
+# -- Override the chart name used in resource names.
+nameOverride: ""
+# -- Override the fully-qualified release name.
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a dedicated ServiceAccount.
+  create: true
+  # -- Name of the ServiceAccount. Generated from the fullname when empty.
+  name: ""
+  # -- Annotations to add to the ServiceAccount.
+  annotations: {}
+  # -- A static site needs no API access, so don't mount a token.
+  automountServiceAccountToken: false
+
+# -- Extra annotations for the Deployment's Pod template.
+podAnnotations: {}
+# -- Extra labels for the Deployment's Pod template.
+podLabels: {}
+
+# -- Pod-level security context.
+podSecurityContext:
+  runAsNonRoot: true
+  # nginx-unprivileged runs as uid/gid 101.
+  runAsUser: 101
+  runAsGroup: 101
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container-level security context. Hardened for a read-only static server.
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 101
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # -- Service type.
+  type: ClusterIP
+  # -- Service port (cluster-internal).
+  port: 80
+  # -- Annotations for the Service.
+  annotations: {}
+
+# -- Expose the site via the Gateway API (HTTPRoute) instead of an Ingress.
+# Requires a Gateway (and the Gateway API CRDs) to already exist in the cluster.
+gateway:
+  enabled: false
+  # -- Parent Gateway(s) this route attaches to. Set name (and namespace if the
+  # Gateway lives elsewhere) plus sectionName to target a specific listener.
+  parentRefs:
+    - name: portfolio-gateway
+      # namespace: gateway-system
+      # sectionName: https
+  # -- Hostnames this route answers for.
+  hostnames:
+    - portfolio.example.com
+  # -- Annotations for the HTTPRoute.
+  annotations: {}
+  # -- Route rules. Each rule's backendRefs default to this chart's Service when
+  # omitted; matches/filters are passed through to the HTTPRoute as-is.
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+# -- Resource requests/limits. A static nginx server is very light.
+# CPU limit is intentionally omitted to avoid throttling under bursts.
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 64Mi
+
+# -- HTTP probes. The container serves the site on port 8080.
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+  timeoutSeconds: 3
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+# -- Startup probe gives the container time to come up before liveness kicks in.
+startupProbe:
+  httpGet:
+    path: /
+    port: http
+  periodSeconds: 5
+  failureThreshold: 12
+
+autoscaling:
+  # -- Enable a HorizontalPodAutoscaler.
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  # -- Create a PodDisruptionBudget to keep capacity during voluntary disruptions.
+  enabled: true
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# -- CiliumNetworkPolicy. Default-deny in both directions: ALL egress is blocked
+# and only the explicitly allowed ingress below is permitted. Requires Cilium as
+# the CNI (CiliumNetworkPolicy CRD, cilium.io/v2).
+ciliumNetworkPolicy:
+  enabled: true
+  # -- Turn on default-deny enforcement per direction. With egress denied and no
+  # egress rules, the Pods cannot initiate any outbound connection.
+  defaultDeny:
+    ingress: true
+    egress: true
+  ingress:
+    # -- Allow inbound HTTP from the Gateway data-plane Pods.
+    # Cilium realizes each Gateway as a "cilium-gateway-<name>" Deployment in the
+    # Gateway's namespace; point the selector at those Pods.
+    fromGateway:
+      enabled: true
+      endpointSelector:
+        matchLabels:
+          k8s:io.kubernetes.pod.namespace: gateway-system
+          # io.cilium.gateway/owning-gateway: portfolio-gateway
+    # -- Allow liveness/readiness probes (kubelet sources them from the node).
+    allowHostProbes: true
+    # -- Additional raw ingress rules (Cilium schema), appended verbatim.
+    extra: []
+  egress:
+    # -- Allow DNS lookups to kube-dns. Off by default — a static site needs none.
+    # Enable this once the Pod must reach other services (e.g. a backend API).
+    allowDNS: false
+    dnsEndpointSelector:
+      matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    # -- Additional raw egress rules (Cilium schema), appended verbatim.
+    extra: []
+
+# -- Volumes required because the root filesystem is read-only.
+# nginx-unprivileged writes its pid and temp files under /tmp.
+emptyDirVolumes:
+  - name: tmp
+    mountPath: /tmp
+
+# -- Node selector for Pod scheduling.
+nodeSelector: {}
+# -- Tolerations for Pod scheduling.
+tolerations: []
+# -- Affinity rules. Defaults below soft-spread replicas across nodes.
+affinity: {}
+# -- Topology spread constraints (e.g. spread across zones).
+topologySpreadConstraints: []
+
+# -- Additional environment variables for the container.
+env: []
+#  - name: TZ
+#    value: Europe/Brussels
+
+# -- Extra volumes to add to the Pod.
+extraVolumes: []
+# -- Extra volume mounts to add to the container.
+extraVolumeMounts: []

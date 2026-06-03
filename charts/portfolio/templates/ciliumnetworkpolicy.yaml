@@ -1,0 +1,61 @@
+{{- if .Values.ciliumNetworkPolicy.enabled -}}
+{{- $cnp := .Values.ciliumNetworkPolicy -}}
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ include "portfolio.fullname" . }}
+  labels:
+    {{- include "portfolio.labels" . | nindent 4 }}
+spec:
+  endpointSelector:
+    matchLabels:
+      {{- include "portfolio.selectorLabels" . | nindent 6 }}
+  # Default-deny per direction. Egress denied + no egress rules below = no
+  # outbound connections; ingress denied except the rules that follow.
+  enableDefaultDeny:
+    ingress: {{ $cnp.defaultDeny.ingress }}
+    egress: {{ $cnp.defaultDeny.egress }}
+  ingress:
+    {{- if $cnp.ingress.fromGateway.enabled }}
+    # Inbound HTTP from the Gateway data-plane Pods.
+    - fromEndpoints:
+        - matchLabels:
+            {{- toYaml $cnp.ingress.fromGateway.endpointSelector.matchLabels | nindent 12 }}
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    {{- end }}
+    {{- if $cnp.ingress.allowHostProbes }}
+    # Liveness/readiness probes from the node (kubelet runs on the host).
+    - fromEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    {{- end }}
+    {{- with $cnp.ingress.extra }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if or $cnp.egress.allowDNS $cnp.egress.extra }}
+  egress:
+    {{- if $cnp.egress.allowDNS }}
+    # DNS resolution to kube-dns.
+    - toEndpoints:
+        - matchLabels:
+            {{- toYaml $cnp.egress.dnsEndpointSelector.matchLabels | nindent 12 }}
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+    {{- end }}
+    {{- with $cnp.egress.extra }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

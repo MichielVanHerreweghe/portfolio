@@ -141,6 +141,14 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
+      - name: Lint & render chart (pre-push guard)
+        run: |
+          # helm package does not render templates, so lint + template here to
+          # ensure a broken chart never reaches the registry.
+          helm lint charts/portfolio --strict
+          helm template release charts/portfolio >/dev/null
+          helm template release charts/portfolio --set gateway.enabled=true >/dev/null
+
       - name: Log in to GHCR for Helm OCI
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" \
