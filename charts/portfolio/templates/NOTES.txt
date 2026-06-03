@@ -1,0 +1,18 @@
+{{ .Chart.Name }} {{ .Chart.Version }} (app {{ .Chart.AppVersion }}) has been deployed as "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+Get the application URL:
+
+{{- if .Values.gateway.enabled }}
+  Routed via Gateway API (HTTPRoute) on:
+{{- range .Values.gateway.hostnames }}
+  https://{{ . }}/
+{{- end }}
+{{- else if eq .Values.service.type "LoadBalancer" }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch it with:
+    kubectl get svc {{ include "portfolio.fullname" . }} -n {{ .Release.Namespace }} -w
+{{- else }}
+  Port-forward to reach the site locally:
+    kubectl port-forward svc/{{ include "portfolio.fullname" . }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+    open http://127.0.0.1:8080
+{{- end }}

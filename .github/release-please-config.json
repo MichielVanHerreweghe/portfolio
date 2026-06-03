@@ -18,9 +18,14 @@
   ],
   "packages": {
     "src/frontend": {
-      "release-type": "node",
       "package-name": "portfolio-frontend",
+      "release-type": "node",
       "component": "portfolio-frontend"
+    },
+    "charts/portfolio": {
+      "release-type": "helm",
+      "package-name": "portfolio",
+      "component": "charts/portfolio"
     }
   }
 }

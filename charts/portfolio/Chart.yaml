@@ -1,0 +1,19 @@
+apiVersion: v2
+name: portfolio
+description: Helm chart for the personal portfolio static site.
+type: application
+
+version: 0.1.0
+
+appVersion: "1.0.0"
+
+home: https://github.com/MichielVanHerreweghe/portfolio
+sources:
+  - https://github.com/MichielVanHerreweghe/portfolio
+maintainers:
+  - name: Michiel Van Herreweghe
+keywords:
+  - portfolio
+  - astro
+  - static-site
+  - nginx

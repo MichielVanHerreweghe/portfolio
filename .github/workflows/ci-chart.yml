@@ -1,0 +1,71 @@
+name: CI · Chart
+
+on:
+  pull_request:
+    paths:
+      - 'charts/portfolio/**'
+      - '.github/workflows/ci-chart.yml'
+
+concurrency:
+  group: ci-chart-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  KUBECONFORM_VERSION: v0.6.7
+  # k8s API version to validate rendered manifests against.
+  K8S_VERSION: "1.31.0"
+
+jobs:
+  validate:
+    name: Lint & render
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint chart
+        run: helm lint charts/portfolio --strict
+
+      - name: Install kubeconform
+        run: |
+          curl -sSL -o kubeconform.tar.gz \
+            "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz"
+          tar -xzf kubeconform.tar.gz kubeconform
+          sudo install -m 0755 kubeconform /usr/local/bin/kubeconform
+          kubeconform -v
+
+      - name: Render & validate manifests
+        run: |
+          set -euo pipefail
+
+          # Render the chart with a given value set, then schema-validate the
+          # output. CRDs (CiliumNetworkPolicy, HTTPRoute) have no published
+          # schema, so they are skipped via -ignore-missing-schemas.
+          validate() {
+            local name="$1"; shift
+            echo "::group::helm template — ${name}"
+            helm template release charts/portfolio "$@" | tee "manifests-${name}.yaml"
+            echo "::endgroup::"
+            kubeconform \
+              -strict \
+              -summary \
+              -ignore-missing-schemas \
+              -kubernetes-version "${K8S_VERSION}" \
+              "manifests-${name}.yaml"
+          }
+
+          # Defaults: ClusterIP, default-deny CiliumNetworkPolicy, no HTTPRoute.
+          validate defaults
+          # Exposure path: HTTPRoute rendered via Gateway API.
+          validate gateway --set gateway.enabled=true
+          # Everything on: HPA + Gateway + DNS egress allowed.
+          validate features \
+            --set gateway.enabled=true \
+            --set autoscaling.enabled=true \
+            --set ciliumNetworkPolicy.egress.allowDNS=true
