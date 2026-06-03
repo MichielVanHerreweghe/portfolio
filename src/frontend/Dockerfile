@@ -12,7 +12,7 @@ RUN npm ci --include=dev
 COPY . .
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.30-alpine AS runtime
 
 COPY --chown=nginx:nginx nginx.conf /etc/nginx/conf.d/default.conf
 
