@@ -11,7 +11,7 @@ import { Icon } from '../icons.jsx';
 import { Reveal, Kicker, Button } from '../primitives.jsx';
 import { ContactFooter } from '../ContactFooter.jsx';
 import { useT } from '../../lib/i18n.jsx';
-import { srcSet, sizes } from '../../lib/img.js';
+import { thumbSrcSet, thumbSrc, sizes } from '../../lib/img.js';
 
 export function ProjectDetailPage({ go, id }) {
   const { C } = useT();
@@ -79,8 +79,15 @@ export function ProjectDetailPage({ go, id }) {
                 return (
                   <a key={s.src || i} href={s.src} target="_blank" rel="noopener noreferrer"
                     className={"pd-tile" + (wide ? " wide" : "")}>
-                    <img src={s.src} srcSet={srcSet(s.src)} sizes={sizes(wide ? 90 : 45)}
-                      alt={s.label || p.title} loading="lazy" decoding="async" />
+                    {/* Grid shows a short top-crop preview (~1MP) so the tiles
+                        paint fast; the <a> still opens the full screenshot.
+                        First tile is the LCP — eager + high priority; the rest
+                        stay lazy so they don't compete. */}
+                    <img src={thumbSrc(s.src)} srcSet={thumbSrcSet(s.src)} sizes={sizes(wide ? 90 : 45)}
+                      alt={s.label || p.title}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      fetchpriority={i === 0 ? "high" : "low"}
+                      decoding="async" />
                     {s.label && <span className="pd-cap mono">{s.label}</span>}
                   </a>
                 );
@@ -96,8 +103,12 @@ export function ProjectDetailPage({ go, id }) {
 
       <style>{`
         .pd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; grid-auto-flow: dense; }
-        .pd-tile { position: relative; display: block; overflow: hidden; border-radius: 12px; border: 1px solid var(--line); height: 340px; cursor: zoom-in; background: var(--surface-2); transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .3s; }
-        .pd-tile.wide { grid-column: 1 / -1; height: 460px; }
+        /* content-visibility keeps off-screen tiles from decoding/painting
+           their multi-megapixel screenshots until they're scrolled near;
+           contain-intrinsic-size reserves the tile box so the scrollbar
+           stays stable. */
+        .pd-tile { position: relative; display: block; overflow: hidden; border-radius: 12px; border: 1px solid var(--line); height: 340px; cursor: zoom-in; background: var(--surface-2); transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .3s; content-visibility: auto; contain-intrinsic-size: auto 340px; }
+        .pd-tile.wide { grid-column: 1 / -1; height: 460px; contain-intrinsic-size: auto 460px; }
         .pd-tile img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; display: block; transition: object-position 4.5s ease; }
         .pd-tile:hover { transform: translateY(-6px) scale(1.015); box-shadow: var(--shadow); border-color: var(--volt); z-index: 2; }
         .pd-tile:hover img { object-position: 50% 100%; }
@@ -105,7 +116,7 @@ export function ProjectDetailPage({ go, id }) {
         .pd-tile:hover .pd-cap { opacity: 1; transform: none; }
         @media (max-width: 820px) {
           .pd-grid { grid-template-columns: 1fr; }
-          .pd-tile, .pd-tile.wide { grid-column: auto; height: 280px; }
+          .pd-tile, .pd-tile.wide { grid-column: auto; height: 280px; contain-intrinsic-size: auto 280px; }
         }
       `}</style>
     </div>
