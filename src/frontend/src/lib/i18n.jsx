@@ -193,13 +193,14 @@ const NL = {
   },
   services: [
     { n: "01", title: "Infrastructuur & Cloud", body: "Cloud-infrastructuur provisioneren en schalen als code — Kubernetes, Terraform en multi-cloud opstellingen die echt verkeer aankunnen.", tags: ["Kubernetes", "Terraform", "AWS / Azure"] },
-    { n: "02", title: "CI/CD & Automatisering", body: "Pipelines die bouwen, testen en deployen zonder gedoe. Van releases zonder downtime tot volledig geautomatiseerde omgevingen.", tags: ["GitLab CI", "GitHub Actions", "ArgoCD"] },
-    { n: "03", title: "Software Engineering", body: "Backend-services en tooling die je kan lezen — proper, observeerbaar en getest. Go en Python waar het telt.", tags: ["Go", "Python", "TypeScript"] },
+    { n: "02", title: "CI/CD & Automatisering", body: "Pipelines die bouwen, testen en deployen zonder gedoe. Van releases zonder downtime tot volledig geautomatiseerde omgevingen.", tags: ["GitHub Actions", "Azure DevOps", "ArgoCD"] },
+    { n: "03", title: "Software Engineering", body: "Backend-services en tooling die je kan lezen — proper, observeerbaar en getest.", tags: [".NET", "React"] },
   ],
   experience: [
-    { role: "Senior DevOps Engineer", org: "Bedrijfsnaam", period: "2023 — heden", body: "Leid infrastructuurautomatisering over meerdere productteams. Deploytijden ~70% verkort met een herbouwd CI/CD-platform en workloads gemigreerd naar managed Kubernetes.", tags: ["Kubernetes", "Terraform", "ArgoCD"] },
-    { role: "Software Engineer", org: "Bedrijfsnaam", period: "2020 — 2023", body: "Backend-services en de automatisering eromheen gebouwd en beheerd. Verantwoordelijk voor de observability-stack en on-call tooling.", tags: ["Go", "Python", "AWS"] },
-    { role: "Junior Developer", org: "Bedrijfsnaam", period: "2018 — 2020", body: "Full-stack feature-werk en de eerste interne CI-pipelines. Waar de DevOps-microbe begon.", tags: ["TypeScript", "Docker", "GitLab CI"] },
+    { role: "Medior Software Engineer", org: "Axxit", period: "2026 - heden", body: "", tags: ["Azure", "GitHub", "Terraform", ".NET", "React"]},
+    { role: "DevOps Engineer", org: "Tomorrowland", period: "2025 — 2026", body: "", tags: ["AWS", "GitHub", "Kubernetes", "Terraform", "ArgoCD"] },
+    { role: "DevOps Engineer", org: "CloudFuel", period: "2024 - 2025", body: "", tags: ["Azure", "GitHub", "Kubernetes", "Docker", ".NET", "Terraform", "ArgoCD"] },
+    { role: "Junior Cloud Application and Platform Engineer", org: "Inetum-RealDolmen", period: "2023 - 2024", body: "", tags: ["Azure", "Docker", "Azure DevOps", ".NET", "Terraform"] },
   ],
   education: [
     { title: "Toegepaste Informatica", org: "HoGent, België", period: "2020 - 2023" },
@@ -256,13 +257,14 @@ const FR = {
   },
   services: [
     { n: "01", title: "Infrastructure & Cloud", body: "Provisionner et faire évoluer l'infrastructure cloud en tant que code — Kubernetes, Terraform et architectures multi-cloud conçues pour encaisser un trafic réel.", tags: ["Kubernetes", "Terraform", "AWS / Azure"] },
-    { n: "02", title: "CI/CD & Automatisation", body: "Des pipelines qui compilent, testent et déploient sans accroc. Des mises en production sans interruption aux environnements entièrement automatisés.", tags: ["GitLab CI", "GitHub Actions", "ArgoCD"] },
-    { n: "03", title: "Développement logiciel", body: "Des services backend et des outils faits pour être lus — propres, observables et testés. Go et Python là où ça compte.", tags: ["Go", "Python", "TypeScript"] },
+    { n: "02", title: "CI/CD & Automatisation", body: "Des pipelines qui compilent, testent et déploient sans accroc. Des mises en production sans interruption aux environnements entièrement automatisés.", tags: ["GitHub Actions", "Azure DevOps", "ArgoCD"] },
+    { n: "03", title: "Développement logiciel", body: "Des services backend et des outils faits pour être lus — propres, observables et testés.", tags: [".NET", "React"] },
   ],
   experience: [
-    { role: "Senior DevOps Engineer", org: "Nom de l'entreprise", period: "2023 — aujourd'hui", body: "Je pilote l'automatisation de l'infrastructure pour plusieurs équipes produit. Temps de déploiement réduits d'environ 70 % grâce à une plateforme CI/CD reconstruite, et migration des workloads vers Kubernetes managé.", tags: ["Kubernetes", "Terraform", "ArgoCD"] },
-    { role: "Software Engineer", org: "Nom de l'entreprise", period: "2020 — 2023", body: "J'ai construit et exploité des services backend et l'automatisation associée. Responsable de la stack d'observabilité et des outils d'astreinte.", tags: ["Go", "Python", "AWS"] },
-    { role: "Junior Developer", org: "Nom de l'entreprise", period: "2018 — 2020", body: "Développement full-stack et les premiers pipelines CI internes. C'est là qu'a commencé le virus du DevOps.", tags: ["TypeScript", "Docker", "GitLab CI"] },
+    { role: "Medior Software Engineer", org: "Axxit", period: "2026 - aujourd'hui", body: "", tags: ["Azure", "GitHub", "Terraform", ".NET", "React"]},
+    { role: "DevOps Engineer", org: "Tomorrowland", period: "2025 — 2026", body: "", tags: ["AWS", "GitHub", "Kubernetes", "Terraform", "ArgoCD"] },
+    { role: "DevOps Engineer", org: "CloudFuel", period: "2024 - 2025", body: "", tags: ["Azure", "GitHub", "Kubernetes", "Docker", ".NET", "Terraform", "ArgoCD"] },
+    { role: "Junior Cloud Application and Platform Engineer", org: "Inetum-RealDolmen", period: "2023 - 2024", body: "", tags: ["Azure", "Docker", "Azure DevOps", ".NET", "Terraform"] },
   ],
   education: [
     { title: "Informatique appliquée", org: "HoGent, Belgique", period: "2020 - 2023" },
