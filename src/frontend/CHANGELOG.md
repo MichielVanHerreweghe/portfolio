@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v1.1.0...portfolio-frontend-v2.0.0) (2026-06-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* add api support ([#15](https://github.com/MichielVanHerreweghe/portfolio/issues/15))
+
+### Features
+
+* add api support ([#15](https://github.com/MichielVanHerreweghe/portfolio/issues/15)) ([76a1bc8](https://github.com/MichielVanHerreweghe/portfolio/commit/76a1bc8dfe9498a53549977ec0618ece9f0ebbc0))
+
 ## [1.1.0](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v1.0.3...portfolio-frontend-v1.1.0) (2026-06-03)
 
 
