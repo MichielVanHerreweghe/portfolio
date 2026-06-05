@@ -75,18 +75,21 @@ backend:
     enabled: true
     refreshInterval: 1h
     secretStoreRef:
-      name: my-cluster-store        # required: your (Cluster)SecretStore
+      name: infisical-store          # required: your Infisical-backed (Cluster)SecretStore
       kind: ClusterSecretStore
     data:
-      - secretKey: MailService__Password
+      - secretKey: MailService__Password    # env var name (Section__Key)
         remoteRef:
-          key: portfolio/mail
-          property: password
+          key: MAIL_PASSWORD               # secret key/name in Infisical
       - secretKey: HardcoverService__ApiToken
         remoteRef:
-          key: portfolio/hardcover
-          property: apiToken
+          key: HARDCOVER_API_TOKEN
 ```
+
+> **Infisical:** provision two secrets at the store's configured project / environment /
+> `secretsPath`: `MAIL_PASSWORD` (your SMTP password) and `HARDCOVER_API_TOKEN` (your
+> Hardcover API token). The project/environment/path live on the `SecretStore`, plus a
+> machine-identity (Universal Auth) `clientId`/`clientSecret` it uses to authenticate.
 
 The cache connection string is **not** a secret here: the in-cluster Dragonfly runs without
 auth (protected by the network policy), so `ConnectionStrings__cache` is rendered into the
@@ -128,6 +131,23 @@ cache:
   snapshot:
     enabled: false          # set true + a PVC spec for persistence
   extraSpec: {}             # any extra Dragonfly spec fields (auth, TLS, ...)
+```
+
+The cache also gets its own default-deny `CiliumNetworkPolicy` (`cache.ciliumNetworkPolicy`)
+selecting the Dragonfly Pods. Ingress to `6379` is allowed only from the backend Pods, the
+other Dragonfly Pods (replication), the kubelet (probes), and the **Dragonfly operator** —
+the operator connects to each instance to configure primary/replica replication, so its
+namespace must be allowed or the `Dragonfly` resource stays unhealthy. Set the operator's
+namespace if it isn't the default:
+
+```yaml
+cache:
+  ciliumNetworkPolicy:
+    ingress:
+      fromOperator:
+        endpointSelector:
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: dragonfly-operator-system
 ```
 
 Not provisioning the cache here (e.g. it lives elsewhere)? Set `cache.enabled=false`, put the
@@ -192,6 +212,8 @@ needs outbound access, so its egress allows:
 
 Optionally allow the frontend to call the backend directly with
 `backend.ciliumNetworkPolicy.ingress.fromFrontend.enabled: true`.
+
+The **cache** has its own policy too — see [Cache](#cache-dragonflydb).
 
 ## Common values
 

@@ -333,6 +333,8 @@ backend:
     # -- How often ESO reconciles the backing secret from the provider.
     refreshInterval: 1h
     # -- Reference to the (Cluster)SecretStore that talks to your secret provider.
+    # For Infisical this is an Infisical-backed (Cluster)SecretStore; the project,
+    # environment and secretsPath are configured on the store, not here.
     secretStoreRef:
       # -- Name of the store (must be set when externalSecret.enabled is true).
       name: ""
@@ -346,15 +348,15 @@ backend:
       # -- Optional advanced ESO target template (e.g. to reshape keys).
       template: {}
     # -- Map provider keys to Secret keys. Each secretKey becomes an env var.
+    # remoteRef.key is the secret's key/name in the provider (Infisical secrets
+    # are flat key=value, so no `property` is needed).
     data:
       - secretKey: MailService__Password
         remoteRef:
-          key: portfolio/mail
-          property: password
+          key: MAIL_PASSWORD
       - secretKey: HardcoverService__ApiToken
         remoteRef:
-          key: portfolio/hardcover
-          property: apiToken
+          key: HARDCOVER_API_TOKEN
       # Note: the cache connection string is NOT here — the in-cluster Dragonfly
       # cache runs without auth and is protected by the CiliumNetworkPolicy, so
       # ConnectionStrings__cache is rendered into the ConfigMap (see `cache`).
