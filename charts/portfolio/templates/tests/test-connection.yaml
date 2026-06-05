@@ -1,9 +1,10 @@
+{{- if .Values.frontend.enabled }}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ include "portfolio.fullname" . }}-test-connection
+  name: {{ include "portfolio.frontend.fullname" . }}-test-connection
   labels:
-    {{- include "portfolio.labels" . | nindent 4 }}
+    {{- include "portfolio.frontend.labels" . | nindent 4 }}
   annotations:
     helm.sh/hook: test
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
@@ -18,10 +19,44 @@ spec:
     - name: wget
       image: busybox:1.37
       command: ['wget']
-      args: ['--spider', '-S', 'http://{{ include "portfolio.fullname" . }}:{{ .Values.service.port }}/']
+      args: ['--spider', '-S', 'http://{{ include "portfolio.frontend.fullname" . }}:{{ .Values.frontend.service.port }}/']
       securityContext:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
         capabilities:
           drop:
             - ALL
+{{- end }}
+{{- if .Values.backend.enabled }}
+{{- if .Values.frontend.enabled }}
+---
+{{- end }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "portfolio.backend.fullname" . }}-test-connection
+  labels:
+    {{- include "portfolio.backend.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    # The API has no unauthenticated health route, so just check TCP reachability.
+    - name: nc
+      image: busybox:1.37
+      command: ['nc']
+      args: ['-z', '-v', '-w3', '{{ include "portfolio.backend.fullname" . }}', '{{ .Values.backend.service.port }}']
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+{{- end }}

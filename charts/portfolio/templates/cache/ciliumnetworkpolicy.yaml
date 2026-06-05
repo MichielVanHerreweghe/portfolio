@@ -1,0 +1,92 @@
+{{- if and .Values.cache.enabled .Values.cache.ciliumNetworkPolicy.enabled -}}
+{{- $cnp := .Values.cache.ciliumNetworkPolicy -}}
+{{- $cacheName := include "portfolio.cache.name" . -}}
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ $cacheName }}
+  labels:
+    {{- include "portfolio.cache.labels" . | nindent 4 }}
+spec:
+  endpointSelector:
+    matchLabels:
+      # Pods the Dragonfly operator creates for this instance.
+      app: {{ $cacheName }}
+  # Default-deny per direction. Only the rules below are permitted.
+  enableDefaultDeny:
+    ingress: {{ $cnp.defaultDeny.ingress }}
+    egress: {{ $cnp.defaultDeny.egress }}
+  ingress:
+    {{- if $cnp.ingress.fromBackend.enabled }}
+    # Inbound from the backend Pods.
+    - fromEndpoints:
+        - matchLabels:
+            {{- include "portfolio.backend.selectorLabels" . | nindent 12 }}
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    {{- end }}
+    {{- if $cnp.ingress.fromOperator.enabled }}
+    # Inbound from the Dragonfly operator (configures replication on 6379).
+    - fromEndpoints:
+        - matchLabels:
+            {{- toYaml $cnp.ingress.fromOperator.endpointSelector.matchLabels | nindent 12 }}
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    {{- end }}
+    {{- if $cnp.ingress.fromPeers.enabled }}
+    # Replication traffic between the Dragonfly Pods.
+    - fromEndpoints:
+        - matchLabels:
+            app: {{ $cacheName }}
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    {{- end }}
+    {{- if $cnp.ingress.allowHostProbes }}
+    # Liveness/readiness probes from the node (kubelet runs on the host).
+    - fromEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    {{- end }}
+    {{- with $cnp.ingress.extra }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if or $cnp.egress.allowDNS $cnp.egress.toPeers.enabled $cnp.egress.extra }}
+  egress:
+    {{- if $cnp.egress.allowDNS }}
+    # DNS resolution to kube-dns.
+    - toEndpoints:
+        - matchLabels:
+            {{- toYaml $cnp.egress.dnsEndpointSelector.matchLabels | nindent 12 }}
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+    {{- end }}
+    {{- if $cnp.egress.toPeers.enabled }}
+    # Replication traffic to the other Dragonfly Pods.
+    - toEndpoints:
+        - matchLabels:
+            app: {{ $cacheName }}
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    {{- end }}
+    {{- with $cnp.egress.extra }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

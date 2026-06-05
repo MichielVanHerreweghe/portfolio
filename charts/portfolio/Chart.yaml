@@ -1,6 +1,6 @@
 apiVersion: v2
 name: portfolio
-description: Helm chart for the personal portfolio static site.
+description: Helm chart for the personal portfolio — Astro static site frontend and .NET API backend.
 type: application
 
 version: 1.0.0
@@ -17,3 +17,6 @@ keywords:
   - astro
   - static-site
   - nginx
+  - dotnet
+  - api
+  - backend

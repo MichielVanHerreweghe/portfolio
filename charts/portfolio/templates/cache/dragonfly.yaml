@@ -1,0 +1,50 @@
+{{- if .Values.cache.enabled -}}
+apiVersion: dragonflydb.io/v1alpha1
+kind: Dragonfly
+metadata:
+  name: {{ include "portfolio.cache.name" . }}
+  labels:
+    {{- include "portfolio.cache.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cache.replicas }}
+  {{- with .Values.cache.image }}
+  image: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.cache.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cache.args }}
+  args:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.cache.snapshot.enabled }}
+  snapshot:
+    {{- with .Values.cache.snapshot.cron }}
+    cron: {{ . | quote }}
+    {{- end }}
+    {{- with .Values.cache.snapshot.persistentVolumeClaimSpec }}
+    persistentVolumeClaimSpec:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.cache.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cache.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cache.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cache.topologySpreadConstraints }}
+  topologySpreadConstraints:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.cache.extraSpec }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end }}
