@@ -1,0 +1,31 @@
+# Build output — regenerated inside the image
+**/bin
+**/obj
+**/out
+artifacts
+
+# Version control & CI
+.git
+.gitignore
+.github
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Editor / OS cruft
+**/.vs
+**/.vscode
+**/.idea
+*.user
+.DS_Store
+Thumbs.db
+
+# Local-only config & secrets — never bake these into an image
+**/appsettings.Development.json
+**/appsettings.*.Development.json
+**/*.user
+secrets.json
+
+# Docs not needed at runtime
+**/*.md

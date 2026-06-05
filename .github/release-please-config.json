@@ -22,6 +22,11 @@
       "release-type": "node",
       "component": "portfolio-frontend"
     },
+    "src/backend": {
+      "package-name": "portfolio-backend",
+      "release-type": "simple",
+      "component": "portfolio-backend"
+    },
     "charts/portfolio": {
       "release-type": "helm",
       "package-name": "portfolio",

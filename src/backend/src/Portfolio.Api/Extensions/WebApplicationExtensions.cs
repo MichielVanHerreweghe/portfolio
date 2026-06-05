@@ -26,6 +26,7 @@ internal static class WebApplicationExtensions
         {
             configuration.Versioning.Prefix = "v";
             configuration.Versioning.PrependToRoute = true;
+            configuration.Versioning.DefaultVersion = 1;
             configuration.Endpoints.RoutePrefix = "api";
         });
     }
