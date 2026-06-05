@@ -60,12 +60,35 @@ jobs:
               "manifests-${name}.yaml"
           }
 
-          # Defaults: ClusterIP, default-deny CiliumNetworkPolicy, no HTTPRoute.
+          # Defaults: both app components + Dragonfly cache, ClusterIP, default-deny
+          # CiliumNetworkPolicy, backend ConfigMap, no HTTPRoute, no ExternalSecret.
           validate defaults
-          # Exposure path: HTTPRoute rendered via Gateway API.
-          validate gateway --set gateway.enabled=true
-          # Everything on: HPA + Gateway + DNS egress allowed.
+          # Exposure path: HTTPRoutes rendered for both components via Gateway API.
+          validate gateway \
+            --set frontend.gateway.enabled=true \
+            --set backend.gateway.enabled=true
+          # Backend secrets sourced via the External Secrets Operator.
+          validate external-secret \
+            --set backend.externalSecret.enabled=true \
+            --set backend.externalSecret.secretStoreRef.name=my-store
+          # Single-component renders.
+          validate frontend-only --set backend.enabled=false
+          validate backend-only \
+            --set frontend.enabled=false \
+            --set backend.existingSecret=portfolio-backend
+          # Cache disabled: no Dragonfly CR, backend points at an external cache.
+          validate no-cache \
+            --set cache.enabled=false \
+            --set backend.config.ConnectionStrings__cache=external-cache:6379 \
+            --set backend.ciliumNetworkPolicy.egress.toCache.enabled=false
+          # Everything on: HPA + Gateway + ExternalSecret + extra egress.
           validate features \
-            --set gateway.enabled=true \
-            --set autoscaling.enabled=true \
-            --set ciliumNetworkPolicy.egress.allowDNS=true
+            --set frontend.gateway.enabled=true \
+            --set backend.gateway.enabled=true \
+            --set frontend.autoscaling.enabled=true \
+            --set backend.autoscaling.enabled=true \
+            --set backend.externalSecret.enabled=true \
+            --set backend.externalSecret.secretStoreRef.name=my-store \
+            --set backend.ciliumNetworkPolicy.ingress.fromFrontend.enabled=true \
+            --set backend.ciliumNetworkPolicy.egress.toCache.enabled=true \
+            --set frontend.ciliumNetworkPolicy.egress.allowDNS=true

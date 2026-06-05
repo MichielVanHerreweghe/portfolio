@@ -1,15 +1,15 @@
-{{- if .Values.ciliumNetworkPolicy.enabled -}}
-{{- $cnp := .Values.ciliumNetworkPolicy -}}
+{{- if and .Values.frontend.enabled .Values.frontend.ciliumNetworkPolicy.enabled -}}
+{{- $cnp := .Values.frontend.ciliumNetworkPolicy -}}
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: {{ include "portfolio.fullname" . }}
+  name: {{ include "portfolio.frontend.fullname" . }}
   labels:
-    {{- include "portfolio.labels" . | nindent 4 }}
+    {{- include "portfolio.frontend.labels" . | nindent 4 }}
 spec:
   endpointSelector:
     matchLabels:
-      {{- include "portfolio.selectorLabels" . | nindent 6 }}
+      {{- include "portfolio.frontend.selectorLabels" . | nindent 6 }}
   # Default-deny per direction. Egress denied + no egress rules below = no
   # outbound connections; ingress denied except the rules that follow.
   enableDefaultDeny:

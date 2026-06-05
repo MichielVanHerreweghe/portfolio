@@ -1,18 +1,63 @@
 {{ .Chart.Name }} {{ .Chart.Version }} (app {{ .Chart.AppVersion }}) has been deployed as "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
 
-Get the application URL:
+Components:
+  frontend: {{ if .Values.frontend.enabled }}enabled{{ else }}disabled{{ end }}
+  backend:  {{ if .Values.backend.enabled }}enabled{{ else }}disabled{{ end }}
+  cache:    {{ if .Values.cache.enabled }}enabled (Dragonfly){{ else }}disabled{{ end }}
 
-{{- if .Values.gateway.enabled }}
+{{- if .Values.frontend.enabled }}
+
+Frontend (static site):
+{{- if .Values.frontend.gateway.enabled }}
   Routed via Gateway API (HTTPRoute) on:
-{{- range .Values.gateway.hostnames }}
-  https://{{ . }}/
+{{- range .Values.frontend.gateway.hostnames }}
+    https://{{ . }}/
 {{- end }}
-{{- else if eq .Values.service.type "LoadBalancer" }}
-  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-        Watch it with:
-    kubectl get svc {{ include "portfolio.fullname" . }} -n {{ .Release.Namespace }} -w
+{{- else if eq .Values.frontend.service.type "LoadBalancer" }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available. Watch it with:
+    kubectl get svc {{ include "portfolio.frontend.fullname" . }} -n {{ .Release.Namespace }} -w
 {{- else }}
   Port-forward to reach the site locally:
-    kubectl port-forward svc/{{ include "portfolio.fullname" . }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+    kubectl port-forward svc/{{ include "portfolio.frontend.fullname" . }} 8080:{{ .Values.frontend.service.port }} -n {{ .Release.Namespace }}
     open http://127.0.0.1:8080
+{{- end }}
+{{- end }}
+
+{{- if .Values.backend.enabled }}
+
+Backend (API):
+{{- if .Values.backend.gateway.enabled }}
+  Routed via Gateway API (HTTPRoute) on:
+{{- range .Values.backend.gateway.hostnames }}
+    https://{{ . }}/api
+{{- end }}
+{{- else }}
+  Port-forward to reach the API locally:
+    kubectl port-forward svc/{{ include "portfolio.backend.fullname" . }} 8080:{{ .Values.backend.service.port }} -n {{ .Release.Namespace }}
+    curl http://127.0.0.1:8080/api/v1/reads/current
+{{- end }}
+
+  Non-sensitive config is in ConfigMap "{{ include "portfolio.backend.configMapName" . }}".
+{{- if .Values.backend.externalSecret.enabled }}
+  Sensitive config is sourced by the External Secrets Operator into Secret
+  "{{ include "portfolio.backend.secretName" . }}" via the ExternalSecret
+  "{{ include "portfolio.backend.fullname" . }}". Check it reconciled:
+    kubectl get externalsecret {{ include "portfolio.backend.fullname" . }} -n {{ .Release.Namespace }}
+{{- else if .Values.backend.existingSecret }}
+  Sensitive config is loaded from the existing Secret "{{ .Values.backend.existingSecret }}".
+{{- else }}
+  WARNING: no Secret is configured for the backend. Set backend.externalSecret.enabled=true
+  (with a secretStoreRef) or backend.existingSecret to supply the mail password
+  and Hardcover API token.
+{{- end }}
+{{- end }}
+
+{{- if .Values.cache.enabled }}
+
+Cache (DragonflyDB):
+  Provisioned via the Dragonfly operator as "{{ include "portfolio.cache.name" . }}"
+  ({{ .Values.cache.replicas }} replica(s)). The backend reaches it at
+  "{{ include "portfolio.cache.name" . }}:6379" (ConnectionStrings__cache). Check it:
+    kubectl get dragonfly {{ include "portfolio.cache.name" . }} -n {{ .Release.Namespace }}
+    kubectl get pods -l app={{ include "portfolio.cache.name" . }} -n {{ .Release.Namespace }}
 {{- end }}

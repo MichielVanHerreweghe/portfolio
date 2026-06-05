@@ -1,0 +1,39 @@
+{{- if and .Values.frontend.enabled .Values.frontend.gateway.enabled -}}
+{{- $fullName := include "portfolio.frontend.fullname" . -}}
+{{- $svcPort := .Values.frontend.service.port -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "portfolio.frontend.labels" . | nindent 4 }}
+  {{- with .Values.frontend.gateway.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- toYaml .Values.frontend.gateway.parentRefs | nindent 4 }}
+  {{- with .Values.frontend.gateway.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.frontend.gateway.rules }}
+    - {{- with .matches }}
+      matches:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .filters }}
+      filters:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      backendRefs:
+        {{- with .backendRefs }}
+        {{- toYaml . | nindent 8 }}
+        {{- else }}
+        - name: {{ $fullName }}
+          port: {{ $svcPort }}
+        {{- end }}
+    {{- end }}
+{{- end }}

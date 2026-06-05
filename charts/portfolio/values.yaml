@@ -1,196 +1,579 @@
 # Default values for the portfolio chart.
 # This is a YAML-formatted file. Values are merged onto these defaults at install/upgrade.
-
-# -- Number of Pod replicas. Ignored when autoscaling.enabled is true.
-replicaCount: 2
-
-image:
-  # -- Container image repository.
-  repository: ghcr.io/michielvanherreweghe/portfolio-frontend
-  # -- Image pull policy.
-  pullPolicy: IfNotPresent
-  # -- Image tag. Defaults to the chart's appVersion when left empty.
-  tag: ""
-
-# -- Image pull secrets for private registries (e.g. GHCR with a PAT).
-imagePullSecrets: []
-#  - name: ghcr-credentials
+#
+# The chart deploys two independently-toggleable components:
+#   - frontend: the Astro static site served by nginx-unprivileged (port 8080).
+#   - backend:  the .NET API (Portfolio.Api, FastEndpoints) on port 8080.
+# Each component has its own image, Deployment, Service, scaling and network policy.
 
 # -- Override the chart name used in resource names.
 nameOverride: ""
 # -- Override the fully-qualified release name.
 fullnameOverride: ""
 
-serviceAccount:
-  # -- Create a dedicated ServiceAccount.
-  create: true
-  # -- Name of the ServiceAccount. Generated from the fullname when empty.
-  name: ""
-  # -- Annotations to add to the ServiceAccount.
-  annotations: {}
-  # -- A static site needs no API access, so don't mount a token.
-  automountServiceAccountToken: false
+# -- Image pull secrets for private registries (e.g. GHCR with a PAT).
+# Shared by both components.
+imagePullSecrets: []
+#  - name: ghcr-credentials
 
-# -- Extra annotations for the Deployment's Pod template.
-podAnnotations: {}
-# -- Extra labels for the Deployment's Pod template.
-podLabels: {}
-
-# -- Pod-level security context.
-podSecurityContext:
-  runAsNonRoot: true
-  # nginx-unprivileged runs as uid/gid 101.
-  runAsUser: 101
-  runAsGroup: 101
-  fsGroup: 101
-  seccompProfile:
-    type: RuntimeDefault
-
-# -- Container-level security context. Hardened for a read-only static server.
-securityContext:
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 101
-  capabilities:
-    drop:
-      - ALL
-
-service:
-  # -- Service type.
-  type: ClusterIP
-  # -- Service port (cluster-internal).
-  port: 80
-  # -- Annotations for the Service.
-  annotations: {}
-
-# -- Expose the site via the Gateway API (HTTPRoute) instead of an Ingress.
-# Requires a Gateway (and the Gateway API CRDs) to already exist in the cluster.
-gateway:
-  enabled: false
-  # -- Parent Gateway(s) this route attaches to. Set name (and namespace if the
-  # Gateway lives elsewhere) plus sectionName to target a specific listener.
-  parentRefs:
-    - name: portfolio-gateway
-      # namespace: gateway-system
-      # sectionName: https
-  # -- Hostnames this route answers for.
-  hostnames:
-    - portfolio.example.com
-  # -- Annotations for the HTTPRoute.
-  annotations: {}
-  # -- Route rules. Each rule's backendRefs default to this chart's Service when
-  # omitted; matches/filters are passed through to the HTTPRoute as-is.
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-
-# -- Resource requests/limits. A static nginx server is very light.
-# CPU limit is intentionally omitted to avoid throttling under bursts.
-resources:
-  requests:
-    cpu: 10m
-    memory: 32Mi
-  limits:
-    memory: 64Mi
-
-# -- HTTP probes. The container serves the site on port 8080.
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-  initialDelaySeconds: 5
-  periodSeconds: 15
-  timeoutSeconds: 3
-  failureThreshold: 3
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-  initialDelaySeconds: 2
-  periodSeconds: 10
-  timeoutSeconds: 3
-  failureThreshold: 3
-# -- Startup probe gives the container time to come up before liveness kicks in.
-startupProbe:
-  httpGet:
-    path: /
-    port: http
-  periodSeconds: 5
-  failureThreshold: 12
-
-autoscaling:
-  # -- Enable a HorizontalPodAutoscaler.
-  enabled: false
-  minReplicas: 2
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-podDisruptionBudget:
-  # -- Create a PodDisruptionBudget to keep capacity during voluntary disruptions.
+# =============================================================================
+# Frontend — Astro static site served by nginx-unprivileged.
+# =============================================================================
+frontend:
+  # -- Deploy the frontend component.
   enabled: true
-  minAvailable: 1
-  # maxUnavailable: 1
 
-# -- CiliumNetworkPolicy. Default-deny in both directions: ALL egress is blocked
-# and only the explicitly allowed ingress below is permitted. Requires Cilium as
-# the CNI (CiliumNetworkPolicy CRD, cilium.io/v2).
-ciliumNetworkPolicy:
-  enabled: true
-  # -- Turn on default-deny enforcement per direction. With egress denied and no
-  # egress rules, the Pods cannot initiate any outbound connection.
-  defaultDeny:
-    ingress: true
-    egress: true
-  ingress:
-    # -- Allow inbound HTTP from the Gateway data-plane Pods.
-    # Cilium realizes each Gateway as a "cilium-gateway-<name>" Deployment in the
-    # Gateway's namespace; point the selector at those Pods.
-    fromGateway:
-      enabled: true
-      endpointSelector:
+  # -- Number of Pod replicas. Ignored when autoscaling.enabled is true.
+  replicaCount: 2
+
+  image:
+    # -- Container image repository.
+    repository: ghcr.io/michielvanherreweghe/portfolio-frontend
+    # -- Image pull policy.
+    pullPolicy: IfNotPresent
+    # -- Image tag. Defaults to the chart's appVersion when left empty.
+    tag: ""
+
+  serviceAccount:
+    # -- Create a dedicated ServiceAccount.
+    create: true
+    # -- Name of the ServiceAccount. Generated from the fullname when empty.
+    name: ""
+    # -- Annotations to add to the ServiceAccount.
+    annotations: {}
+    # -- A static site needs no API access, so don't mount a token.
+    automountServiceAccountToken: false
+
+  # -- Extra annotations for the Deployment's Pod template.
+  podAnnotations: {}
+  # -- Extra labels for the Deployment's Pod template.
+  podLabels: {}
+
+  # -- Pod-level security context.
+  podSecurityContext:
+    runAsNonRoot: true
+    # nginx-unprivileged runs as uid/gid 101.
+    runAsUser: 101
+    runAsGroup: 101
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+
+  # -- Container-level security context. Hardened for a read-only static server.
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 101
+    capabilities:
+      drop:
+        - ALL
+
+  service:
+    # -- Service type.
+    type: ClusterIP
+    # -- Service port (cluster-internal).
+    port: 80
+    # -- Annotations for the Service.
+    annotations: {}
+
+  # -- Expose the site via the Gateway API (HTTPRoute) instead of an Ingress.
+  # Requires a Gateway (and the Gateway API CRDs) to already exist in the cluster.
+  gateway:
+    enabled: false
+    # -- Parent Gateway(s) this route attaches to. Set name (and namespace if the
+    # Gateway lives elsewhere) plus sectionName to target a specific listener.
+    parentRefs:
+      - name: portfolio-gateway
+        # namespace: gateway-system
+        # sectionName: https
+    # -- Hostnames this route answers for.
+    hostnames:
+      - portfolio.example.com
+    # -- Annotations for the HTTPRoute.
+    annotations: {}
+    # -- Route rules. Each rule's backendRefs default to this component's Service
+    # when omitted; matches/filters are passed through to the HTTPRoute as-is.
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+
+  # -- Resource requests/limits. A static nginx server is very light.
+  # CPU limit is intentionally omitted to avoid throttling under bursts.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
+
+  # -- HTTP probes. The container serves the site on port 8080.
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 2
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  # -- Startup probe gives the container time to come up before liveness kicks in.
+  startupProbe:
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 5
+    failureThreshold: 12
+
+  autoscaling:
+    # -- Enable a HorizontalPodAutoscaler.
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget to keep capacity during voluntary disruptions.
+    enabled: true
+    minAvailable: 1
+    # maxUnavailable: 1
+
+  # -- CiliumNetworkPolicy. Default-deny in both directions: ALL egress is blocked
+  # and only the explicitly allowed ingress below is permitted. Requires Cilium as
+  # the CNI (CiliumNetworkPolicy CRD, cilium.io/v2).
+  ciliumNetworkPolicy:
+    enabled: true
+    # -- Turn on default-deny enforcement per direction. With egress denied and no
+    # egress rules, the Pods cannot initiate any outbound connection.
+    defaultDeny:
+      ingress: true
+      egress: true
+    ingress:
+      # -- Allow inbound HTTP from the Gateway data-plane Pods.
+      # Cilium realizes each Gateway as a "cilium-gateway-<name>" Deployment in the
+      # Gateway's namespace; point the selector at those Pods.
+      fromGateway:
+        enabled: true
+        endpointSelector:
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: gateway-system
+            # io.cilium.gateway/owning-gateway: portfolio-gateway
+      # -- Allow liveness/readiness probes (kubelet sources them from the node).
+      allowHostProbes: true
+      # -- Additional raw ingress rules (Cilium schema), appended verbatim.
+      extra: []
+    egress:
+      # -- Allow DNS lookups to kube-dns. Off by default — a static site needs none.
+      allowDNS: false
+      dnsEndpointSelector:
         matchLabels:
-          k8s:io.kubernetes.pod.namespace: gateway-system
-          # io.cilium.gateway/owning-gateway: portfolio-gateway
-    # -- Allow liveness/readiness probes (kubelet sources them from the node).
-    allowHostProbes: true
-    # -- Additional raw ingress rules (Cilium schema), appended verbatim.
-    extra: []
-  egress:
-    # -- Allow DNS lookups to kube-dns. Off by default — a static site needs none.
-    # Enable this once the Pod must reach other services (e.g. a backend API).
-    allowDNS: false
-    dnsEndpointSelector:
-      matchLabels:
-        k8s:io.kubernetes.pod.namespace: kube-system
-        k8s-app: kube-dns
-    # -- Additional raw egress rules (Cilium schema), appended verbatim.
-    extra: []
+          k8s:io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      # -- Additional raw egress rules (Cilium schema), appended verbatim.
+      extra: []
 
-# -- Volumes required because the root filesystem is read-only.
-# nginx-unprivileged writes its pid and temp files under /tmp.
-emptyDirVolumes:
-  - name: tmp
-    mountPath: /tmp
+  # -- Volumes required because the root filesystem is read-only.
+  # nginx-unprivileged writes its pid and temp files under /tmp.
+  emptyDirVolumes:
+    - name: tmp
+      mountPath: /tmp
 
-# -- Node selector for Pod scheduling.
-nodeSelector: {}
-# -- Tolerations for Pod scheduling.
-tolerations: []
-# -- Affinity rules. Defaults below soft-spread replicas across nodes.
-affinity: {}
-# -- Topology spread constraints (e.g. spread across zones).
-topologySpreadConstraints: []
+  # -- Node selector for Pod scheduling.
+  nodeSelector: {}
+  # -- Tolerations for Pod scheduling.
+  tolerations: []
+  # -- Affinity rules.
+  affinity: {}
+  # -- Topology spread constraints (e.g. spread across zones).
+  topologySpreadConstraints: []
 
-# -- Additional environment variables for the container.
-env: []
-#  - name: TZ
-#    value: Europe/Brussels
+  # -- Additional environment variables for the container.
+  env: []
+  #  - name: TZ
+  #    value: Europe/Brussels
 
-# -- Extra volumes to add to the Pod.
-extraVolumes: []
-# -- Extra volume mounts to add to the container.
-extraVolumeMounts: []
+  # -- Extra volumes to add to the Pod.
+  extraVolumes: []
+  # -- Extra volume mounts to add to the container.
+  extraVolumeMounts: []
+
+# =============================================================================
+# Backend — .NET API (Portfolio.Api / FastEndpoints).
+# =============================================================================
+backend:
+  # -- Deploy the backend component.
+  enabled: true
+
+  # -- Number of Pod replicas. Ignored when autoscaling.enabled is true.
+  replicaCount: 2
+
+  image:
+    # -- Container image repository.
+    repository: ghcr.io/michielvanherreweghe/portfolio-backend
+    # -- Image pull policy.
+    pullPolicy: IfNotPresent
+    # -- Image tag. Defaults to the chart's appVersion when left empty.
+    # The backend versions independently of the chart — pin this in production.
+    tag: ""
+
+  serviceAccount:
+    # -- Create a dedicated ServiceAccount.
+    create: true
+    # -- Name of the ServiceAccount. Generated from the fullname when empty.
+    name: ""
+    # -- Annotations to add to the ServiceAccount.
+    annotations: {}
+    # -- The API needs no Kubernetes API access, so don't mount a token.
+    automountServiceAccountToken: false
+
+  # -- Extra annotations for the Deployment's Pod template.
+  podAnnotations: {}
+  # -- Extra labels for the Deployment's Pod template.
+  podLabels: {}
+
+  # -- Pod-level security context.
+  podSecurityContext:
+    runAsNonRoot: true
+    # The .NET chiseled image runs as the non-root "app" user (uid/gid 1654).
+    runAsUser: 1654
+    runAsGroup: 1654
+    fsGroup: 1654
+    seccompProfile:
+      type: RuntimeDefault
+
+  # -- Container-level security context. Hardened: read-only root filesystem with
+  # an emptyDir mounted at /tmp for any scratch writes.
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1654
+    capabilities:
+      drop:
+        - ALL
+
+  service:
+    # -- Service type.
+    type: ClusterIP
+    # -- Service port (cluster-internal).
+    port: 80
+    # -- Annotations for the Service.
+    annotations: {}
+
+  # -- Expose the API via the Gateway API (HTTPRoute).
+  # Requires a Gateway (and the Gateway API CRDs) to already exist in the cluster.
+  gateway:
+    enabled: false
+    # -- Parent Gateway(s) this route attaches to.
+    parentRefs:
+      - name: portfolio-gateway
+        # namespace: gateway-system
+        # sectionName: https
+    # -- Hostnames this route answers for.
+    hostnames:
+      - api.portfolio.example.com
+    # -- Annotations for the HTTPRoute.
+    annotations: {}
+    # -- Route rules. Each rule's backendRefs default to this component's Service
+    # when omitted. The API serves everything under /api.
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /api
+
+  # -- Non-sensitive configuration rendered into a ConfigMap and injected as
+  # environment variables (envFrom). Keys use the ASP.NET Core double-underscore
+  # convention (Section__Key). Sensitive values belong in `externalSecret` below.
+  config:
+    ASPNETCORE_ENVIRONMENT: Production
+    # The API listens on 8080 to match the container port / probes.
+    ASPNETCORE_HTTP_PORTS: "8080"
+    # Mail (SMTP) — non-sensitive fields. Password is in the External Secret.
+    MailService__Host: ""
+    MailService__Port: "587"
+    MailService__Username: ""
+    MailService__ToName: ""
+    MailService__ToEmailAddress: ""
+    MailService__FromName: ""
+    MailService__FromEmailAddress: ""
+    MailService__UseSsl: "true"
+    # Hardcover API — non-sensitive fields. ApiToken is in the External Secret.
+    HardcoverService__BaseUrl: "https://api.hardcover.app/v1/graphql"
+    # Dragonfly cache key prefix. The connection string (ConnectionStrings__cache)
+    # is derived from the `cache` section below and added to this ConfigMap; set it
+    # here explicitly to point the backend at an externally-managed cache instead.
+    Cache__InstanceName: "portfolio:"
+
+  # -- Extra key/value config merged into the ConfigMap (e.g. logging overrides).
+  extraConfig: {}
+  #  Logging__LogLevel__Default: Information
+
+  # -- Sensitive configuration sourced via the External Secrets Operator.
+  # Renders an ExternalSecret (external-secrets.io) that materializes a Kubernetes
+  # Secret, which the Deployment consumes via envFrom. Each secretKey becomes an
+  # environment variable, so use the ASP.NET Core Section__Key convention.
+  externalSecret:
+    # -- Create an ExternalSecret. Requires the External Secrets Operator and a
+    # (Cluster)SecretStore to be installed in the cluster. Off by default because
+    # the store is environment-specific; enable it and set secretStoreRef.name.
+    enabled: false
+    # -- API version of the ExternalSecret CRD. Bump to v1beta1 on older operators.
+    apiVersion: external-secrets.io/v1
+    # -- How often ESO reconciles the backing secret from the provider.
+    refreshInterval: 1h
+    # -- Reference to the (Cluster)SecretStore that talks to your secret provider.
+    secretStoreRef:
+      # -- Name of the store (must be set when externalSecret.enabled is true).
+      name: ""
+      # -- ClusterSecretStore or SecretStore.
+      kind: ClusterSecretStore
+    target:
+      # -- Name of the Secret ESO creates. Defaults to the backend fullname.
+      name: ""
+      # -- creationPolicy for the managed Secret.
+      creationPolicy: Owner
+      # -- Optional advanced ESO target template (e.g. to reshape keys).
+      template: {}
+    # -- Map provider keys to Secret keys. Each secretKey becomes an env var.
+    data:
+      - secretKey: MailService__Password
+        remoteRef:
+          key: portfolio/mail
+          property: password
+      - secretKey: HardcoverService__ApiToken
+        remoteRef:
+          key: portfolio/hardcover
+          property: apiToken
+      # Note: the cache connection string is NOT here — the in-cluster Dragonfly
+      # cache runs without auth and is protected by the CiliumNetworkPolicy, so
+      # ConnectionStrings__cache is rendered into the ConfigMap (see `cache`).
+    # -- Pull whole provider secrets at once (ESO dataFrom), appended verbatim.
+    dataFrom: []
+
+  # -- Use a pre-existing Kubernetes Secret instead of (or in addition to) the
+  # ExternalSecret. When set, the Deployment loads env from this Secret. Leave
+  # empty to use the ExternalSecret's target Secret.
+  existingSecret: ""
+
+  # -- Resource requests/limits for the API.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+
+  # -- Probes. There is no HTTP health endpoint yet, so a TCP-socket check is used.
+  # Swap to httpGet once a /health endpoint exists.
+  livenessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 15
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  startupProbe:
+    tcpSocket:
+      port: http
+    periodSeconds: 5
+    failureThreshold: 30
+
+  autoscaling:
+    # -- Enable a HorizontalPodAutoscaler.
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget to keep capacity during voluntary disruptions.
+    enabled: true
+    minAvailable: 1
+    # maxUnavailable: 1
+
+  # -- CiliumNetworkPolicy. Default-deny both directions; the API needs outbound
+  # access to DNS, the Hardcover HTTPS API, an SMTP relay and the Redis cache.
+  ciliumNetworkPolicy:
+    enabled: true
+    defaultDeny:
+      ingress: true
+      egress: true
+    ingress:
+      # -- Allow inbound HTTP from the Gateway data-plane Pods.
+      fromGateway:
+        enabled: true
+        endpointSelector:
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: gateway-system
+            # io.cilium.gateway/owning-gateway: portfolio-gateway
+      # -- Allow inbound from the frontend Pods (e.g. server-side API calls).
+      fromFrontend:
+        enabled: false
+      # -- Allow liveness/readiness probes (kubelet sources them from the node).
+      allowHostProbes: true
+      # -- Additional raw ingress rules (Cilium schema), appended verbatim.
+      extra: []
+    egress:
+      # -- Allow DNS lookups to kube-dns. Required to resolve external hosts.
+      allowDNS: true
+      dnsEndpointSelector:
+        matchLabels:
+          k8s:io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      # -- Allow outbound to external services (entity: world) on these ports.
+      # Defaults cover the Hardcover HTTPS API (443) and SMTP submission (587).
+      toWorldPorts:
+        - port: "443"
+          protocol: TCP
+        - port: "587"
+          protocol: TCP
+      # -- Allow outbound to the in-cluster Dragonfly cache. Enabled by default;
+      # when endpointSelector is empty it targets the Dragonfly Pods provisioned
+      # by the `cache` section (the operator labels them `app: <cache name>`).
+      # Set endpointSelector to point at an externally-managed cache instead.
+      toCache:
+        enabled: true
+        port: "6379"
+        endpointSelector: {}
+          # app: my-dragonfly
+      # -- Additional raw egress rules (Cilium schema), appended verbatim.
+      extra: []
+
+  # -- emptyDir volumes mounted because the root filesystem is read-only.
+  emptyDirVolumes:
+    - name: tmp
+      mountPath: /tmp
+
+  # -- Node selector for Pod scheduling.
+  nodeSelector: {}
+  # -- Tolerations for Pod scheduling.
+  tolerations: []
+  # -- Affinity rules.
+  affinity: {}
+  # -- Topology spread constraints (e.g. spread across zones).
+  topologySpreadConstraints: []
+
+  # -- Additional environment variables for the container (raw env entries).
+  env: []
+  #  - name: TZ
+  #    value: Europe/Brussels
+
+  # -- Extra volumes to add to the Pod.
+  extraVolumes: []
+  # -- Extra volume mounts to add to the container.
+  extraVolumeMounts: []
+
+# =============================================================================
+# Cache — DragonflyDB, provisioned through the Dragonfly operator
+# (dragonflydb.io/v1alpha1). Dragonfly speaks the Redis protocol, so the backend
+# connects to it with the StackExchange.Redis client unchanged. The operator
+# creates a StatefulSet and a Service of the same name on port 6379.
+# =============================================================================
+cache:
+  # -- Provision a Dragonfly instance. Requires the Dragonfly operator installed.
+  enabled: true
+
+  # -- Name of the Dragonfly resource (and its Service). The backend's
+  # ConnectionStrings__cache defaults to "<name>:6379". Defaults to
+  # "<fullname>-cache" when left empty.
+  name: ""
+
+  # -- Dragonfly container image. The operator's default is used when empty.
+  image: ""
+
+  # -- Total instances managed by the operator (1 primary + the rest replicas).
+  replicas: 2
+
+  # -- Resource requests/limits for each Dragonfly Pod.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+  # -- Extra command-line arguments passed to Dragonfly.
+  args: []
+  #  - "--maxmemory=450mb"
+  #  - "--cache_mode=true"
+
+  # -- Persistence via periodic snapshots. Leave disabled for an ephemeral cache.
+  snapshot:
+    enabled: false
+    # -- Snapshot schedule (cron). Operator default applies when empty.
+    cron: ""
+    # -- PVC spec for snapshot storage (Kubernetes PersistentVolumeClaimSpec).
+    persistentVolumeClaimSpec: {}
+    #   accessModes: ["ReadWriteOnce"]
+    #   resources:
+    #     requests:
+    #       storage: 1Gi
+
+  # -- Scheduling for the Dragonfly Pods.
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+
+  # -- Extra fields merged verbatim into the Dragonfly spec (e.g. authentication,
+  # tlsSecretRef, serviceSpec). Use the operator's spec schema.
+  extraSpec: {}
+
+  # -- CiliumNetworkPolicy for the Dragonfly Pods themselves. Default-deny both
+  # directions; only the rules below are permitted. Applies to the Pods the
+  # operator labels `app: <cache name>`.
+  ciliumNetworkPolicy:
+    enabled: true
+    defaultDeny:
+      ingress: true
+      egress: true
+    ingress:
+      # -- Allow the backend Pods to reach the cache on 6379.
+      fromBackend:
+        enabled: true
+      # -- Allow the Dragonfly operator to reach the Pods on 6379. The operator
+      # connects to each instance to configure primary/replica replication, so
+      # blocking this leaves the Dragonfly resource stuck and unhealthy.
+      fromOperator:
+        enabled: true
+        endpointSelector:
+          matchLabels:
+            k8s:io.kubernetes.pod.namespace: dragonfly-operator-system
+      # -- Allow replication traffic between the Dragonfly Pods (replica -> primary).
+      fromPeers:
+        enabled: true
+      # -- Allow liveness/readiness probes from the node (kubelet).
+      allowHostProbes: true
+      # -- Additional raw ingress rules (Cilium schema), appended verbatim.
+      extra: []
+    egress:
+      # -- Allow DNS lookups to kube-dns.
+      allowDNS: true
+      dnsEndpointSelector:
+        matchLabels:
+          k8s:io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      # -- Allow replication traffic to the other Dragonfly Pods (primary <- replica).
+      toPeers:
+        enabled: true
+      # -- Additional raw egress rules (Cilium schema), appended verbatim.
+      extra: []
