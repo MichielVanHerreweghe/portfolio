@@ -182,11 +182,23 @@ frontend:
       # -- Additional raw egress rules (Cilium schema), appended verbatim.
       extra: []
 
+  # -- API reverse proxy. The frontend nginx forwards same-origin /api/* to the
+  # in-cluster backend Service (the backend is not exposed via the Gateway). The
+  # chart injects BACKEND_UPSTREAM into the container; leave `upstream` empty to
+  # default to this release's backend Service (<backend fullname>:<service port>),
+  # or set it to target an external/differently-named backend.
+  apiProxy:
+    upstream: ""
+
   # -- Volumes required because the root filesystem is read-only.
-  # nginx-unprivileged writes its pid and temp files under /tmp.
+  # nginx-unprivileged writes its pid/temp files under /tmp, and the entrypoint
+  # renders the envsubst'd nginx config into /etc/nginx/conf.d (so that dir must
+  # be writable). Requires the v2 frontend image, whose config is a template.
   emptyDirVolumes:
     - name: tmp
       mountPath: /tmp
+    - name: nginx-conf
+      mountPath: /etc/nginx/conf.d
 
   # -- Node selector for Pod scheduling.
   nodeSelector: {}

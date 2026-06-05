@@ -14,7 +14,16 @@ RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1.30-alpine AS runtime
 
-COPY --chown=nginx:nginx nginx.conf /etc/nginx/conf.d/default.conf
+# nginx.conf is an envsubst template: the image entrypoint renders it to
+# /etc/nginx/conf.d/default.conf at start, substituting ${BACKEND_UPSTREAM}.
+# Default upstream targets a "portfolio" release; the Helm chart overrides it
+# with the actual backend Service via the BACKEND_UPSTREAM env var.
+# NOTE: under a read-only root filesystem, mount a writable emptyDir at
+# /etc/nginx/conf.d so the entrypoint can write the rendered config (the chart
+# does this by default).
+ENV BACKEND_UPSTREAM=portfolio-backend:80
+
+COPY --chown=nginx:nginx nginx.conf /etc/nginx/templates/default.conf.template
 
 COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
 

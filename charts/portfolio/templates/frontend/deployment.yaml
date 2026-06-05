@@ -46,7 +46,12 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          {{- with .Values.frontend.env }}
+          {{- $env := .Values.frontend.env | default list }}
+          {{- if .Values.backend.enabled }}
+          {{- $upstream := .Values.frontend.apiProxy.upstream | default (printf "%s:%v" (include "portfolio.backend.fullname" .) .Values.backend.service.port) }}
+          {{- $env = prepend $env (dict "name" "BACKEND_UPSTREAM" "value" $upstream) }}
+          {{- end }}
+          {{- with $env }}
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
