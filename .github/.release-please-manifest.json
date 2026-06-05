@@ -1,5 +1,5 @@
 {
-  "src/frontend": "2.1.1",
+  "src/frontend": "2.1.2",
   "src/backend": "1.0.0",
   "charts/portfolio": "2.1.0"
 }

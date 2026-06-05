@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.1...portfolio-frontend-v2.1.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* add local resolvers statement ([#24](https://github.com/MichielVanHerreweghe/portfolio/issues/24)) ([cd2da6a](https://github.com/MichielVanHerreweghe/portfolio/commit/cd2da6a4208d9acac01088ac35d3c4b1cd5c67e1))
+
 ## [2.1.1](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.0...portfolio-frontend-v2.1.1) (2026-06-05)
 
 
