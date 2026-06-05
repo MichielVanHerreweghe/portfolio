@@ -1,8 +1,10 @@
 /* AboutPage.jsx */
+import { useEffect, useState } from 'react';
 import { Icon } from '../icons.jsx';
 import { Button, Reveal, Kicker } from '../primitives.jsx';
 import { ContactFooter } from '../ContactFooter.jsx';
 import { useT } from '../../lib/i18n.jsx';
+import { getCurrentReads } from '../../lib/api.js';
 
 function AboutHero() {
   const { C, lang } = useT();
@@ -171,8 +173,24 @@ function Education() {
 function OffTheClock() {
   const { C } = useT();
   const u = C.ui;
-  const r = C.reading;
   const iconFor = (k) => (Icon[k] || Icon.book)({});
+
+  // Currently-reading list comes from the backend (Hardcover, cached server-side).
+  // Until it resolves — or if the request fails — fall back to the static list in
+  // i18n so the section always renders something.
+  const [reads, setReads] = useState(null);
+  useEffect(() => {
+    const ctrl = new AbortController();
+    getCurrentReads(ctrl.signal)
+      .then((data) =>
+        setReads(data.map((b) => ({ title: b.title, author: b.author, cover: b.coverImageUrl }))),
+      )
+      .catch((e) => { if (e.name !== "AbortError") setReads(null); });
+    return () => ctrl.abort();
+  }, []);
+  // Use the backend list when it has entries; otherwise keep the static fallback
+  // so the section never renders empty (loading, request failure, or no reads).
+  const r = reads && reads.length ? reads : C.reading;
   return (
     <section className="wrap" style={{ padding: "60px 40px 30px" }}>
       <Reveal><Kicker>{u.otcKicker}</Kicker></Reveal>

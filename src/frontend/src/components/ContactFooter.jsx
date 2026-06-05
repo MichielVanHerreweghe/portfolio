@@ -3,23 +3,44 @@ import { useState } from 'react';
 import { Icon } from './icons.jsx';
 import { Button, Reveal, Kicker } from './primitives.jsx';
 import { useT } from '../lib/i18n.jsx';
+import { sendContactMail } from '../lib/api.js';
 
 export function ContactFooter({ go }) {
   const { C } = useT();
   const u = C.ui;
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendErr, setSendErr] = useState(false);
   const [err, setErr] = useState({});
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (e) => {
+  // Mirror the backend's FluentValidation rules so invalid input is caught
+  // before the request rather than coming back as a 400.
+  const submit = async (e) => {
     e.preventDefault();
+    if (sending) return;
     const next = {};
-    if (!form.name.trim()) next.name = true;
+    if (form.name.trim().length < 6) next.name = true;
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) next.email = true;
-    if (form.message.trim().length < 4) next.message = true;
+    if (form.message.trim().length < 10) next.message = true;
     setErr(next);
-    if (Object.keys(next).length === 0) { setSent(true); }
+    if (Object.keys(next).length > 0) return;
+
+    setSendErr(false);
+    setSending(true);
+    try {
+      await sendContactMail({
+        senderName: form.name.trim(),
+        senderEmailAddress: form.email.trim(),
+        message: form.message.trim(),
+      });
+      setSent(true);
+    } catch {
+      setSendErr(true);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -75,7 +96,10 @@ export function ContactFooter({ go }) {
                     <div>
                       <textarea className="field" placeholder={u.phMsg} rows={4} value={form.message} onChange={set("message")} style={{ resize: "vertical", ...(err.message ? { borderColor: "#ff6b6b" } : {}) }} />
                     </div>
-                    <Button type="submit" icon={<Icon.arrow />} style={{ justifyContent: "center", width: "100%", marginTop: 4 }}>{u.sendMsg}</Button>
+                    {sendErr && (
+                      <div role="alert" style={{ color: "#ff6b6b", fontSize: 14, lineHeight: 1.5 }}>{u.sendError}</div>
+                    )}
+                    <Button type="submit" icon={<Icon.arrow />} disabled={sending} style={{ justifyContent: "center", width: "100%", marginTop: 4, ...(sending ? { opacity: 0.6, pointerEvents: "none" } : {}) }}>{sending ? u.sending : u.sendMsg}</Button>
                   </div>
                 </form>
               )}
