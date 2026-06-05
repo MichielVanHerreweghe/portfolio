@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/MichielVanHerreweghe/portfolio/compare/charts/portfolio-v2.0.0...charts/portfolio-v2.1.0) (2026-06-05)
+
+
+### Features
+
+* add api proxying ([#19](https://github.com/MichielVanHerreweghe/portfolio/issues/19)) ([1cb0799](https://github.com/MichielVanHerreweghe/portfolio/commit/1cb079974c2bf2b840ee863dc30cbc2bc59ad45d))
+
 ## [2.0.0](https://github.com/MichielVanHerreweghe/portfolio/compare/charts/portfolio-v1.0.0...charts/portfolio-v2.0.0) (2026-06-05)
 
 
