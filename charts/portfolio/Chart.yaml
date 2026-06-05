@@ -1,9 +1,10 @@
 apiVersion: v2
 name: portfolio
-description: Helm chart for the personal portfolio — Astro static site frontend and .NET API backend.
+description: Helm chart for the personal portfolio — Astro static site frontend
+  and .NET API backend.
 type: application
 
-version: 1.0.0
+version: 2.0.0
 
 appVersion: "1.0.0"
 
