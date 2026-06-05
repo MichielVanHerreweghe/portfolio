@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.0...portfolio-frontend-v2.1.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* remove faulty local=on statement ([#22](https://github.com/MichielVanHerreweghe/portfolio/issues/22)) ([524de7e](https://github.com/MichielVanHerreweghe/portfolio/commit/524de7e7f9b9e23104d59b1915c72711b40b24c8))
+
 ## [2.1.0](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.0.0...portfolio-frontend-v2.1.0) (2026-06-05)
 
 
