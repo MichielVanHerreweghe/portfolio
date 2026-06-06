@@ -201,8 +201,15 @@ backend:
 your Gateway's data-plane Pods (for Cilium's Gateway API these are the
 `cilium-gateway-<name>` Pods in the Gateway's namespace).
 
-The **frontend** denies all egress (a static server initiates nothing). The **backend**
-needs outbound access, so its egress allows:
+The **frontend** nginx reverse-proxies same-origin `/api/*` to the backend Service, so its
+egress allows (and nothing else):
+
+- DNS to kube-dns (`egress.allowDNS: true`) — needed so nginx can resolve the backend
+  Service name at request time (see `nginx.conf`'s `resolver`)
+- the in-cluster backend Pods on port `8080` via `egress.toBackend` (on by default; set
+  `enabled: false` to lock it down if you expose the backend some other way)
+
+The **backend** needs outbound access, so its egress allows:
 
 - DNS to kube-dns (`egress.allowDNS: true`)
 - external services on `egress.toWorldPorts` (defaults: `443` for the Hardcover API,
@@ -210,8 +217,10 @@ needs outbound access, so its egress allows:
 - the in-cluster Dragonfly cache via `egress.toCache` (on by default; targets the
   provisioned cache's Pods, or set `endpointSelector` for an external one)
 
-Optionally allow the frontend to call the backend directly with
-`backend.ciliumNetworkPolicy.ingress.fromFrontend.enabled: true`.
+Its ingress allows the frontend's proxied `/api` calls via
+`backend.ciliumNetworkPolicy.ingress.fromFrontend.enabled: true` (on by default). The
+two halves — frontend `egress.toBackend` and backend `ingress.fromFrontend` — must both
+be enabled for the contact form and other `/api/*` calls to work.
 
 The **cache** has its own policy too — see [Cache](#cache-dragonflydb).
 
@@ -223,6 +232,8 @@ The **cache** has its own policy too — see [Cache](#cache-dragonflydb).
 | `frontend.image.repository` | `ghcr.io/michielvanherreweghe/portfolio-frontend` | Frontend image repo. |
 | `frontend.service.port` | `80` | Frontend Service port (targets container `8080`). |
 | `frontend.gateway.enabled` | `false` | Expose the frontend via Gateway API. |
+| `frontend.ciliumNetworkPolicy.egress.allowDNS` | `true` | Allow DNS so nginx can resolve the backend for the `/api` proxy. |
+| `frontend.ciliumNetworkPolicy.egress.toBackend.enabled` | `true` | Allow egress to the backend Pods for the same-origin `/api` proxy. |
 | `backend.enabled` | `true` | Deploy the backend API. |
 | `backend.image.repository` | `ghcr.io/michielvanherreweghe/portfolio-backend` | Backend image repo. |
 | `backend.config` | mail/hardcover/cache keys | Non-sensitive env (ConfigMap). |
@@ -230,6 +241,7 @@ The **cache** has its own policy too — see [Cache](#cache-dragonflydb).
 | `backend.externalSecret.secretStoreRef.name` | `""` | **Required** (Cluster)SecretStore name. |
 | `backend.existingSecret` | `""` | Use a pre-existing Secret instead of ESO. |
 | `backend.gateway.enabled` | `false` | Expose the backend via Gateway API. |
+| `backend.ciliumNetworkPolicy.ingress.fromFrontend.enabled` | `true` | Accept the frontend's proxied `/api` calls. |
 | `backend.ciliumNetworkPolicy.egress.toWorldPorts` | `443`, `587` | External egress ports. |
 | `cache.enabled` | `true` | Provision a Dragonfly instance via the operator. |
 | `cache.name` | `""` | Dragonfly/Service name (defaults to `<fullname>-cache`). |

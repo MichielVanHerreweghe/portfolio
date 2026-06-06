@@ -39,7 +39,7 @@ spec:
     {{- with $cnp.ingress.extra }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- if or $cnp.egress.allowDNS $cnp.egress.extra }}
+  {{- if or $cnp.egress.allowDNS $cnp.egress.toBackend.enabled $cnp.egress.extra }}
   egress:
     {{- if $cnp.egress.allowDNS }}
     # DNS resolution to kube-dns.
@@ -53,6 +53,17 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
+    {{- end }}
+    {{- if and $cnp.egress.toBackend.enabled .Values.backend.enabled }}
+    # Reverse-proxy /api/* to the in-cluster backend Pods. Requires allowDNS so
+    # nginx can resolve the backend Service name at request time (see nginx.conf).
+    - toEndpoints:
+        - matchLabels:
+            {{- include "portfolio.backend.selectorLabels" . | nindent 12 }}
+      toPorts:
+        - ports:
+            - port: {{ $cnp.egress.toBackend.port | quote }}
+              protocol: TCP
     {{- end }}
     {{- with $cnp.egress.extra }}
     {{- toYaml . | nindent 4 }}
