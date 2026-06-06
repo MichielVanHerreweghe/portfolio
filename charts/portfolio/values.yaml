@@ -32,7 +32,7 @@ frontend:
     # -- Image pull policy.
     pullPolicy: IfNotPresent
     # -- Image tag. Defaults to the chart's appVersion when left empty.
-    tag: "2.0.0"
+    tag: "2.1.1"
 
   serviceAccount:
     # -- Create a dedicated ServiceAccount.
@@ -148,9 +148,10 @@ frontend:
     minAvailable: 1
     # maxUnavailable: 1
 
-  # -- CiliumNetworkPolicy. Default-deny in both directions: ALL egress is blocked
-  # and only the explicitly allowed ingress below is permitted. Requires Cilium as
-  # the CNI (CiliumNetworkPolicy CRD, cilium.io/v2).
+  # -- CiliumNetworkPolicy. Default-deny in both directions: only the explicitly
+  # allowed ingress/egress below is permitted. Egress is limited to DNS and the
+  # backend Service so the same-origin /api proxy works. Requires Cilium as the
+  # CNI (CiliumNetworkPolicy CRD, cilium.io/v2).
   ciliumNetworkPolicy:
     enabled: true
     # -- Turn on default-deny enforcement per direction. With egress denied and no
@@ -173,12 +174,19 @@ frontend:
       # -- Additional raw ingress rules (Cilium schema), appended verbatim.
       extra: []
     egress:
-      # -- Allow DNS lookups to kube-dns. Off by default — a static site needs none.
-      allowDNS: false
+      # -- Allow DNS lookups to kube-dns. Required so nginx can resolve the backend
+      # Service at request time for the /api proxy (see nginx.conf's resolver).
+      allowDNS: true
       dnsEndpointSelector:
         matchLabels:
           k8s:io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      # -- Allow egress to the backend Pods for the same-origin /api reverse proxy.
+      # Targets this release's backend by selector; the port is the backend Pod's
+      # container port (8080), not the Service port. Needs allowDNS (above).
+      toBackend:
+        enabled: true
+        port: "8080"
       # -- Additional raw egress rules (Cilium schema), appended verbatim.
       extra: []
 
@@ -439,9 +447,10 @@ backend:
           matchLabels:
             k8s:io.kubernetes.pod.namespace: gateway-system
             # io.cilium.gateway/owning-gateway: portfolio-gateway
-      # -- Allow inbound from the frontend Pods (e.g. server-side API calls).
+      # -- Allow inbound from the frontend Pods (the same-origin /api reverse
+      # proxy). Required for the contact form and other /api/* calls to work.
       fromFrontend:
-        enabled: false
+        enabled: true
       # -- Allow liveness/readiness probes (kubelet sources them from the node).
       allowHostProbes: true
       # -- Additional raw ingress rules (Cilium schema), appended verbatim.
