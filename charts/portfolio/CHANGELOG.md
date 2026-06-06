@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/MichielVanHerreweghe/portfolio/compare/charts/portfolio-v2.1.0...charts/portfolio-v2.1.1) (2026-06-06)
+
+
+### Bug Fixes
+
+* ingress and egress allowances ([#26](https://github.com/MichielVanHerreweghe/portfolio/issues/26)) ([7ae9e57](https://github.com/MichielVanHerreweghe/portfolio/commit/7ae9e57900679bcbcb24023e0e02421dbcb61698))
+
 ## [2.1.0](https://github.com/MichielVanHerreweghe/portfolio/compare/charts/portfolio-v2.0.0...charts/portfolio-v2.1.0) (2026-06-05)
 
 
