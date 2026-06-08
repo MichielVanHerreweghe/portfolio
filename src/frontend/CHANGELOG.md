@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.3](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.2...portfolio-frontend-v2.1.3) (2026-06-08)
+
+
+### Bug Fixes
+
+* poor SEO scoring ([#28](https://github.com/MichielVanHerreweghe/portfolio/issues/28)) ([46752f3](https://github.com/MichielVanHerreweghe/portfolio/commit/46752f31147f83ebad9fb1628cf68f2f70716d50))
+
 ## [2.1.2](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.1...portfolio-frontend-v2.1.2) (2026-06-05)
 
 
