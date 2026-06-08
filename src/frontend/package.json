@@ -9,6 +9,8 @@
     "start": "astro dev",
     "prebuild": "node scripts/optimize-images.mjs",
     "build": "astro build",
+    "postbuild": "node scripts/render-nginx-csp.mjs",
+    "render:nginx": "node scripts/render-nginx-csp.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "optimize:images": "node scripts/optimize-images.mjs",
