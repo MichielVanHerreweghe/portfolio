@@ -18,6 +18,9 @@ FROM nginxinc/nginx-unprivileged:1.30-alpine AS runtime
 # /etc/nginx/conf.d/default.conf at start, substituting ${BACKEND_UPSTREAM}.
 # Default upstream targets a "portfolio" release; the Helm chart overrides it
 # with the actual backend Service via the BACKEND_UPSTREAM env var.
+# We ship nginx.conf.rendered (not the raw nginx.conf): the `npm run build`
+# postbuild step injects the inline-script CSP hashes from dist/ into it, so the
+# shipped CSP always matches the shipped scripts (see scripts/render-nginx-csp.mjs).
 # NOTE: under a read-only root filesystem, mount a writable emptyDir at
 # /etc/nginx/conf.d so the entrypoint can write the rendered config (the chart
 # does this by default).
@@ -29,7 +32,7 @@ ENV BACKEND_UPSTREAM=portfolio-backend:80
 # empty and nginx fails to start ("host not found in resolver").
 ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 
-COPY --chown=nginx:nginx nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=build --chown=nginx:nginx /app/nginx.conf.rendered /etc/nginx/templates/default.conf.template
 
 COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
 

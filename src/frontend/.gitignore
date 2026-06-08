@@ -2,3 +2,9 @@
 # `npm run optimize:images` (also run via prebuild/predev). Source of truth is
 # the PNGs in image-sources/; these are build artifacts, not checked in.
 public/projects/**/*.webp
+
+# nginx.conf with the CSP script-src hashes injected by the `postbuild` step
+# (scripts/render-nginx-csp.mjs). Source of truth is the committed nginx.conf
+# template; this rendered copy is a build artifact the Docker image consumes.
+nginx.conf.rendered
+
