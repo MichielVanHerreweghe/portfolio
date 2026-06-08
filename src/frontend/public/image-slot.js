@@ -225,7 +225,7 @@
 
   class ImageSlot extends HTMLElement {
     static get observedAttributes() {
-      return ['shape', 'radius', 'mask', 'fit', 'position', 'placeholder', 'src', 'srcset', 'sizes', 'id'];
+      return ['shape', 'radius', 'mask', 'fit', 'position', 'placeholder', 'src', 'srcset', 'sizes', 'alt', 'id'];
     }
 
     constructor() {
@@ -614,6 +614,10 @@
         };
       }
       this._cap.textContent = this.getAttribute('placeholder') || 'Drop an image';
+      // Real alt text for the rendered <img> — image SEO + accessibility. The
+      // author sets it on the host element; the shadow <img> defaults to alt=""
+      // (decorative) when none is given. The ghost reframe layer stays alt="".
+      this._img.alt = this.getAttribute('alt') || '';
       // Toggle via style.display — the [hidden] attribute alone loses to
       // the display:flex / display:block rules in the stylesheet above.
       if (url) {

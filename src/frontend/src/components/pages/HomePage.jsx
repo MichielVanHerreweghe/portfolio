@@ -118,7 +118,7 @@ function FeaturedWork({ go }) {
         {items.map((p, i) => (
           <Reveal key={p.id} delay={i * 90}>
             <button onClick={() => go("portfolio")} className="card feat-card" style={{ padding: 0, textAlign: "left", width: "100%", overflow: "hidden", display: "block", color: "var(--text)" }}>
-              <image-slot id={"home-" + p.id} src={p.cover} srcset={srcSet(p.cover)} sizes={sizes(33)} style={{ width: "100%", height: 200 }} shape="rect" placeholder={p.kind}></image-slot>
+              <image-slot id={"home-" + p.id} src={p.cover} srcset={srcSet(p.cover)} sizes={sizes(33)} alt={p.title + " — " + p.kind} style={{ width: "100%", height: 200 }} shape="rect" placeholder={p.kind}></image-slot>
               <div style={{ padding: "20px 22px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <h3 style={{ fontSize: 21 }}>{p.title}</h3>

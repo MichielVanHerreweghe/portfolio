@@ -5,8 +5,8 @@ import { Button } from './primitives.jsx';
 import { useT, LANGS } from '../lib/i18n.jsx';
 import { pathFor, isPlainLeftClick } from '../lib/routes.js';
 
-export function Nav({ route, go, theme, toggleTheme }) {
-  const { lang, setLang, C } = useT();
+export function Nav({ route, go, theme, toggleTheme, switchLang }) {
+  const { lang, C } = useT();
   const u = C.ui;
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -38,13 +38,13 @@ export function Nav({ route, go, theme, toggleTheme }) {
   // intercept plain left-clicks so client-side navigation keeps the SPA feel.
   const navClick = (id) => (e) => { if (isPlainLeftClick(e)) { e.preventDefault(); nav(id); } };
   const cur = LANGS.find(l => l.code === lang) || LANGS[0];
-  const pickLang = (code) => { setLang(code); setLangOpen(false); };
+  const pickLang = (code) => { switchLang(code); setLangOpen(false); };
 
   return (
     <nav className={"nav" + (scrolled ? " scrolled" : "")}>
       <div className="nav-progress" style={{ width: progress + "%" }} />
       <div className="nav-inner">
-        <a className="brand" href={pathFor("home")} onClick={navClick("home")} aria-label="Michiel Van Herreweghe — home">
+        <a className="brand" href={pathFor("home", null, lang)} onClick={navClick("home")} aria-label="Michiel Van Herreweghe — home">
           <span className="monogram">M</span>
           <span className="wordmark">
             <b><span className="wm-full">Michiel Van&nbsp;Herreweghe</span><span className="wm-short">Michiel V.H.</span></b>
@@ -55,7 +55,7 @@ export function Nav({ route, go, theme, toggleTheme }) {
         <div className="nav-right">
           <div className="nav-links desktop-only">
             {links.map(([id, label]) => (
-              <a key={id} href={pathFor(id)} className={"nav-link" + (route === id ? " active" : "")} onClick={navClick(id)}>{label}</a>
+              <a key={id} href={pathFor(id, null, lang)} className={"nav-link" + (route === id ? " active" : "")} onClick={navClick(id)}>{label}</a>
             ))}
           </div>
           <span className="nav-divider desktop-only" />
@@ -93,7 +93,7 @@ export function Nav({ route, go, theme, toggleTheme }) {
       <div className={"mobile-panel" + (open ? " open" : "")}>
         <div className="mp-inner">
           {links.map(([id, label]) => (
-            <a key={id} href={pathFor(id)} className={"mp-link" + (route === id ? " active" : "")} onClick={navClick(id)}>
+            <a key={id} href={pathFor(id, null, lang)} className={"mp-link" + (route === id ? " active" : "")} onClick={navClick(id)}>
               {label} {route === id && <span className="mono" style={{ fontSize: 13, color: "var(--volt-text)" }}>● {u.now}</span>}
             </a>
           ))}
@@ -102,7 +102,7 @@ export function Nav({ route, go, theme, toggleTheme }) {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
             <span className="mono" style={{ fontSize: 12, letterSpacing: "0.14em", color: "var(--faint)", textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 8 }}><Icon.globe /> {u.langLabel}</span>
             {LANGS.map(l => (
-              <button key={l.code} onClick={() => setLang(l.code)} className="mono"
+              <button key={l.code} onClick={() => switchLang(l.code)} className="mono"
                 style={{ fontSize: 14, fontWeight: 600, padding: "8px 14px", borderRadius: 99, border: "1px solid var(--line)", background: l.code === lang ? "var(--volt)" : "transparent", color: l.code === lang ? "#0B0B0C" : "var(--muted)" }}>
                 {l.short}
               </button>

@@ -13,7 +13,10 @@ export function useReveal() {
       const r = el.getBoundingClientRect();
       return r.top < (window.innerHeight || 800) * 0.96 && r.bottom > 0;
     };
-    if (inView()) { requestAnimationFrame(show); return; }
+    // Synchronous (not rAF): when App arms reveals on mount, already-in-view
+    // elements must already carry `.in` so html.reveal-armed can't blink them
+    // out. Child effects run before App's, so this lands first.
+    if (inView()) { show(); return; }
     let done = false;
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting && !done) { done = true; show(); io.disconnect(); } });

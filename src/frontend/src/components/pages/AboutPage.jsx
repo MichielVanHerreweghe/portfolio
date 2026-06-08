@@ -35,7 +35,7 @@ function AboutHero() {
         </div>
         <Reveal delay={160}>
           <div style={{ position: "relative" }}>
-            <image-slot id="headshot" style={{ width: "100%", aspectRatio: "4/5" }} shape="rounded" radius="8" placeholder="Drop your headshot"></image-slot>
+            <image-slot id="headshot" alt={C.name} style={{ width: "100%", aspectRatio: "4/5" }} shape="rounded" radius="8" placeholder="Drop your headshot"></image-slot>
             <div className="mono" style={{ position: "absolute", left: 14, bottom: 14, background: "var(--volt)", color: "#0B0B0C", fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", padding: "7px 11px", borderRadius: 3 }}>{u.locationBadge}</div>
           </div>
         </Reveal>
@@ -208,7 +208,7 @@ function OffTheClock() {
             </div>
             {r.map((b, i) => (
               <div key={b.title + i} style={{ display: "flex", gap: 22, alignItems: "center", paddingTop: i ? 24 : 0, borderTop: i ? "1px solid var(--line)" : "none" }}>
-                <image-slot id={"book-cover-" + i} src={b.cover || undefined} style={{ width: 96, height: 142, flex: "0 0 auto" }} shape="rounded" radius="4" placeholder="cover"></image-slot>
+                <image-slot id={"book-cover-" + i} src={b.cover || undefined} alt={b.title + " — " + b.author} style={{ width: 96, height: 142, flex: "0 0 auto" }} shape="rounded" radius="4" placeholder="cover"></image-slot>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{ fontSize: 24, lineHeight: 1.1 }}>{b.title}</h3>
                   <div style={{ color: "var(--muted)", fontSize: 16, marginTop: 8 }}>{b.author}</div>

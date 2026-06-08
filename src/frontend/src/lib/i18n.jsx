@@ -325,18 +325,17 @@ export const I18N = { en: EN, nl: NL, fr: FR };
 const LangContext = React.createContext({ lang: "en", setLang: () => {}, C: EN });
 export const useT = () => React.useContext(LangContext);
 
-export function LangProvider({ children }) {
-  // Always start from "en" so the server-rendered HTML and the first client
-  // render agree (no hydration mismatch). A returning visitor's saved language
-  // is applied in an effect right after mount.
-  const [lang, setLangState] = React.useState("en");
-  React.useEffect(() => {
-    const saved = localStorage.getItem("mvh-lang");
-    if (saved && I18N[saved] && saved !== "en") setLangState(saved);
-  }, []);
+export function LangProvider({ initialLang = "en", children }) {
+  // Language is determined by the URL (path-prefix i18n), passed in from the
+  // Astro page that server-rendered this app. Starting from that value keeps
+  // the SSR HTML and the first client render in agreement (no hydration
+  // mismatch) — every localized page SSRs in its own language.
+  const [lang, setLangState] = React.useState(I18N[initialLang] ? initialLang : "en");
   React.useEffect(() => {
     document.documentElement.lang = lang;
-    localStorage.setItem("mvh-lang", lang);
+    // Persisted only as a hint for the language picker / Resume link; the URL,
+    // not this value, is the source of truth for which language renders.
+    try { localStorage.setItem("mvh-lang", lang); } catch (e) {}
   }, [lang]);
   const setLang = (l) => { if (I18N[l]) setLangState(l); };
   const C = I18N[lang] || EN;

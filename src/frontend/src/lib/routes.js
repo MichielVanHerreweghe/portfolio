@@ -1,29 +1,49 @@
-/* routes.js — single source of truth for path-based routing.
+/* routes.js — single source of truth for locale-aware path routing.
  *
- * The site is delivered as real, crawlable Astro pages (/, /portfolio, /about,
- * /projects/<slug>) that each mount the same React app and hand it an initial
- * route. Client-side navigation then uses the History API (pushState) so the
- * SPA page transitions still work, while every destination remains a real URL
- * that search engines can index. */
+ * The site ships as real, crawlable Astro pages, statically pre-rendered per
+ * locale: English at the root (/, /portfolio/, /about/, /projects/<slug>/) and
+ * Dutch/French path-prefixed (/nl/…, /fr/…). Each page mounts the same React
+ * app and hands it an initial route + locale. Client-side navigation then uses
+ * the History API (pushState) so the SPA transitions still work, while every
+ * destination remains a real, indexable URL.
+ *
+ * Paths are emitted with a trailing slash to match the canonical/sitemap form
+ * (Astro builds directory-style: /about/ → /about/index.html). */
 
-export const ROUTES = ["home", "portfolio", "about"];
+export const LOCALES = ['en', 'nl', 'fr'];
+export const DEFAULT_LOCALE = 'en';
+export const ROUTES = ['home', 'portfolio', 'about'];
 
-/** Build the URL path for a logical route + optional param (project slug). */
-export function pathFor(route, param) {
-  if (route === "project" && param) return "/projects/" + param;
-  if (route === "portfolio") return "/portfolio";
-  if (route === "about") return "/about";
-  return "/";
+/** Logical route + optional param → path segment (no locale, no slashes). */
+function segmentFor(route, param) {
+  if (route === 'project' && param) return 'projects/' + param;
+  if (route === 'portfolio') return 'portfolio';
+  if (route === 'about') return 'about';
+  return ''; // home
 }
 
-/** Map a real pathname back to a logical { route, param }. */
+/** Build the URL path for a logical route + optional param, in a given locale.
+ *  Always trailing-slashed. e.g. pathFor('about', null, 'nl') → '/nl/about/'. */
+export function pathFor(route, param, lang = DEFAULT_LOCALE) {
+  const seg = segmentFor(route, param);
+  const prefix = lang && lang !== DEFAULT_LOCALE ? '/' + lang : '';
+  return prefix + '/' + (seg ? seg + '/' : '');
+}
+
+/** Map a real pathname back to { lang, route, param }. Tolerates a missing or
+ *  present trailing slash and an optional leading locale segment. */
 export function parseLocation(pathname) {
-  if (typeof pathname !== "string") return { route: "home", param: null };
-  const parts = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
-  if (parts[0] === "projects" && parts[1]) return { route: "project", param: parts[1] };
-  if (parts[0] === "portfolio") return { route: "portfolio", param: null };
-  if (parts[0] === "about") return { route: "about", param: null };
-  return { route: "home", param: null };
+  if (typeof pathname !== 'string') return { lang: DEFAULT_LOCALE, route: 'home', param: null };
+  let parts = pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+  let lang = DEFAULT_LOCALE;
+  if (parts[0] && LOCALES.includes(parts[0]) && parts[0] !== DEFAULT_LOCALE) {
+    lang = parts[0];
+    parts = parts.slice(1);
+  }
+  if (parts[0] === 'projects' && parts[1]) return { lang, route: 'project', param: parts[1] };
+  if (parts[0] === 'portfolio') return { lang, route: 'portfolio', param: null };
+  if (parts[0] === 'about') return { lang, route: 'about', param: null };
+  return { lang, route: 'home', param: null };
 }
 
 /** Should an anchor click be handled in-app, or left to the browser?
