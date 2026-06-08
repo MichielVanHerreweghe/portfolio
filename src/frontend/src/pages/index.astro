@@ -14,17 +14,32 @@ const description = C.ui.heroIntro;
 const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': site + '/#person',
   name: C.name,
   url: site + '/',
+  image: site + '/og.png',
   jobTitle: C.role,
   description,
-  address: { '@type': 'PostalAddress', addressCountry: C.location },
+  address: { '@type': 'PostalAddress', addressCountry: 'BE', addressRegion: C.location },
   knowsAbout: C.stack,
   sameAs: C.socials.map((s) => s.href),
 };
+
+// schema.org WebSite — gives Google the formal site name (sitelinks) and pairs
+// with the Person via `publisher` so the knowledge graph links them.
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': site + '/#website',
+  url: site + '/',
+  name: C.name,
+  description,
+  inLanguage: ['en', 'nl', 'fr'],
+  publisher: { '@id': site + '/#person' },
+};
 ---
 
-<Layout title={title} description={description} jsonLd={personLd}>
+<Layout title={title} description={description} jsonLd={[websiteLd, personLd]}>
   <div id="root">
     <Site client:load initialRoute="home" />
   </div>

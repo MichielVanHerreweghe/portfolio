@@ -2,3 +2,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://nomaddigital.dev/sitemap-index.xml
+
+# Plain-text site summary for AI / LLM crawlers (ChatGPT, Perplexity, Claude,
+# Google AI Overviews). Standards-track at https://llmstxt.org/.
+# X-Robots-Tag: llms-txt: /llms.txt

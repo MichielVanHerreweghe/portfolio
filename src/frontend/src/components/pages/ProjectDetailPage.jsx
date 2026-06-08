@@ -82,9 +82,15 @@ export function ProjectDetailPage({ go, id }) {
                     {/* Grid shows a short top-crop preview (~1MP) so the tiles
                         paint fast; the <a> still opens the full screenshot.
                         First tile is the LCP — eager + high priority; the rest
-                        stay lazy so they don't compete. */}
+                        stay lazy so they don't compete.
+
+                        alt text is composed: "<project title> — <page label>".
+                        The label alone ("Home", "Menu") is meaningless out of
+                        context to Google Images or a screen reader scrubbing
+                        a list of figures; the project title disambiguates
+                        across all shots on the page. */}
                     <img src={thumbSrc(s.src)} srcSet={thumbSrcSet(s.src)} sizes={sizes(wide ? 90 : 45)}
-                      alt={s.label || p.title}
+                      alt={s.label ? `${p.title} — ${s.label}` : `${p.title} screenshot`}
                       loading={i === 0 ? "eager" : "lazy"}
                       fetchpriority={i === 0 ? "high" : "low"}
                       decoding="async" />
