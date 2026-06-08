@@ -44,6 +44,16 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="author" content="Michiel Van Herreweghe" />
     <meta name="theme-color" content="#0B0B0C" />
 
+    {/* hreflang — all three language variants of every page live at the
+        same URL (i18n is currently a client-side localStorage swap), so we
+        advertise the canonical URL for each `hreflang` plus `x-default`.
+        This is the minimum signal that the EN URL is intended to serve all
+        three audiences until path-prefix i18n is introduced. */}
+    <link rel="alternate" hreflang="en" href={canonical} />
+    <link rel="alternate" hreflang="nl" href={canonical} />
+    <link rel="alternate" hreflang="fr" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
+
     <!-- Icons -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
@@ -54,13 +64,19 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={imageUrl} />
-    <meta property="og:locale" content="en" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="nl_BE" />
+    <meta property="og:locale:alternate" content="fr_BE" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content={title} />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

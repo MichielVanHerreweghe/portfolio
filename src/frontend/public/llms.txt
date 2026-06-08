@@ -1,0 +1,71 @@
+# Michiel Van Herreweghe — DevOps & Software Engineer
+
+> Belgium-based engineer building resilient pipelines, clean infrastructure,
+> and software that ships. Available for roles, contracts, and project work.
+
+## About
+
+- Name: Michiel Van Herreweghe
+- Role: DevOps & Software Engineer
+- Location: Belgium
+- Current employer (2026–present): Axxit (Medior Software Engineer)
+- Previous employers: Tomorrowland (DevOps, 2025–2026), CloudFuel (DevOps,
+  2024–2025), Inetum-RealDolmen (Junior Cloud Application & Platform Engineer,
+  2023–2024)
+- Education: Applied Computer Science (HoGent, 2020–2023); Information
+  Management & Security (Thomas More, 2019–2020)
+- Certifications: GitHub Foundations, CKAD (Certified Kubernetes Application
+  Developer)
+
+## Pages
+
+- [Home](https://nomaddigital.dev/): overview, services, featured work
+- [About](https://nomaddigital.dev/about/): background, stack, experience,
+  education, certifications, hobbies
+- [Portfolio](https://nomaddigital.dev/portfolio/): selected projects
+- [Résumé (EN)](https://nomaddigital.dev/Resume.html?lang=en)
+- [Résumé (NL)](https://nomaddigital.dev/Resume.html?lang=nl)
+- [Résumé (FR)](https://nomaddigital.dev/Resume.html?lang=fr)
+
+## Projects
+
+- [`'t Vijverhof`](https://nomaddigital.dev/projects/t-vijverhof/) (2025):
+  Restaurant marketing site in Erpe-Mere, Belgium. Menu, wine and dessert
+  pages, photo gallery, embedded online reservation widget.
+  Live: https://www.tvijverhof.be/
+
+- [Uitvaartbegeleiding Stefaan](https://nomaddigital.dev/projects/uitvaartbegeleiding-stefaan/) (2021):
+  Marketing site for a family-run funeral home in Brakel, Belgium. Covers
+  every step from reporting a death to the ceremony, aula and funerarium —
+  with 360° livestreaming of services. Live:
+  https://www.uitvaartbegeleidingstefaan.be/
+
+## Services
+
+1. Infrastructure & Cloud — Provisioning and scaling cloud infrastructure as
+   code. Kubernetes, Terraform, multi-cloud setups built to survive real
+   traffic.
+2. CI/CD & Automation — Pipelines that build, test, and deploy without drama.
+   Zero-downtime releases, fully automated environments.
+3. Software Engineering — Backend services and tooling written to be read.
+   Clean, observable, tested. .NET and React.
+
+## Stack
+
+- Infrastructure: Kubernetes, Docker, Terraform, Ansible, Helm
+- Cloud: AWS, Azure
+- CI/CD: GitHub Actions, Azure DevOps, ArgoCD
+- Languages: .NET (C#), TypeScript / React
+- Observability: Prometheus, Grafana, Loki, Tempo, OpenTelemetry
+- Data: PostgreSQL, MySQL, Microsoft SQL Server
+
+## Contact
+
+- Email via the contact form on https://nomaddigital.dev/
+- LinkedIn: https://linkedin.com/in/michiel-van-herreweghe-0ba4b71a7
+- GitHub: https://github.com/michielvanherreweghe
+
+## Languages
+
+Site UI available in English (default), Nederlands, Français. All language
+versions live at the same URL; switch via the language menu in the navigation.

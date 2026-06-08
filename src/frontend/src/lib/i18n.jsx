@@ -27,7 +27,7 @@ const NEUTRAL = {
   ],
   // language-neutral skill items
   skillItems: {
-    Infrastructure: ["Kubernetes", "Docker", "Terraform", "Ansible", "Helm", "Ansible"],
+    Infrastructure: ["Kubernetes", "Docker", "Terraform", "Ansible", "Helm"],
     Cloud: ["AWS", "Azure"],
     CICD: ["GitHub Actions", "Azure DevOps", "ArgoCD"],
     Languages: [".NET"],
@@ -134,10 +134,22 @@ const EN = {
     { n: "03", title: "Software Engineering", body: "Backend services and tooling written to be read — clean, observable, and tested.", tags: [".NET", "React"] },
   ],
   experience: [
-    { role: "Medior Software Engineer", org: "Axxit", period: "2026 - present", body: "", tags: ["Azure", "GitHub", "Terraform", ".NET", "React"]},
-    { role: "DevOps Engineer", org: "Tomorrowland", period: "2025 — 2026", body: "", tags: ["AWS", "GitHub", "Kubernetes", "Terraform", "ArgoCD"] },
-    { role: "DevOps Engineer", org: "CloudFuel", period: "2024 - 2025", body: "", tags: ["Azure", "GitHub", "Kubernetes", "Docker", ".NET", "Terraform", "ArgoCD"] },
-    { role: "Junior Cloud Application and Platform Engineer", org: "Inetum-RealDolmen", period: "2023 - 2024", body: "", tags: ["Azure", "Docker", "Azure DevOps", ".NET", "Terraform"] },
+    // Body lines summarise the stack tagged on each role — they're a content
+    // floor so the SSR HTML and structured data have something coherent to
+    // expose. Swap for outcome-shaped copy (impact, scale, decisions) when
+    // you're ready to publish more detail.
+    { role: "Medior Software Engineer", org: "Axxit", period: "2026 - present",
+      body: "Building .NET services and React front-ends on Azure, with infrastructure provisioned through Terraform and shipped via GitHub Actions.",
+      tags: ["Azure", "GitHub", "Terraform", ".NET", "React"] },
+    { role: "DevOps Engineer", org: "Tomorrowland", period: "2025 — 2026",
+      body: "Ran Kubernetes workloads on AWS for event-scale traffic, with infrastructure managed in Terraform and continuous delivery through ArgoCD.",
+      tags: ["AWS", "GitHub", "Kubernetes", "Terraform", "ArgoCD"] },
+    { role: "DevOps Engineer", org: "CloudFuel", period: "2024 - 2025",
+      body: "Designed and operated Kubernetes platforms on Azure for .NET workloads, with Terraform infrastructure and GitOps-style deploys via ArgoCD.",
+      tags: ["Azure", "GitHub", "Kubernetes", "Docker", ".NET", "Terraform", "ArgoCD"] },
+    { role: "Junior Cloud Application and Platform Engineer", org: "Inetum-RealDolmen", period: "2023 - 2024",
+      body: "Shipped containerised .NET applications on Azure, with Terraform for infrastructure and Azure DevOps pipelines for build and release.",
+      tags: ["Azure", "Docker", "Azure DevOps", ".NET", "Terraform"] },
   ],
   education: [
     { title: "Applied Computer Science", org: "HoGent, Belgium", period: "2020 - 2023" },
@@ -195,13 +207,24 @@ const NL = {
   },
   services: [
     { n: "01", title: "Infrastructuur & Cloud", body: "Cloud-infrastructuur provisioneren en schalen als code — Kubernetes, Terraform en multi-cloud opstellingen die echt verkeer aankunnen.", tags: ["Kubernetes", "Terraform", "AWS / Azure"] },
-    { n: "02", title: "CI/CD & Automatisering", body: "Pipelines die bouwen, testen en deployen zonder gedoe. Van releases zonder downtime tot volledig geautomatiseerde omgevingen.", tags: ["GitLab CI", "GitHub Actions", "ArgoCD"] },
-    { n: "03", title: "Software Engineering", body: "Backend-services en tooling die je kan lezen — proper, observeerbaar en getest. Go en Python waar het telt.", tags: ["Go", "Python", "TypeScript"] },
+    { n: "02", title: "CI/CD & Automatisering", body: "Pipelines die bouwen, testen en deployen zonder gedoe. Van releases zonder downtime tot volledig geautomatiseerde omgevingen.", tags: ["GitHub Actions", "Azure DevOps", "ArgoCD"] },
+    { n: "03", title: "Software Engineering", body: "Backend-services en tooling die je kan lezen — proper, observeerbaar en getest.", tags: [".NET", "React"] },
   ],
   experience: [
-    { role: "Senior DevOps Engineer", org: "Bedrijfsnaam", period: "2023 — heden", body: "Leid infrastructuurautomatisering over meerdere productteams. Deploytijden ~70% verkort met een herbouwd CI/CD-platform en workloads gemigreerd naar managed Kubernetes.", tags: ["Kubernetes", "Terraform", "ArgoCD"] },
-    { role: "Software Engineer", org: "Bedrijfsnaam", period: "2020 — 2023", body: "Backend-services en de automatisering eromheen gebouwd en beheerd. Verantwoordelijk voor de observability-stack en on-call tooling.", tags: ["Go", "Python", "AWS"] },
-    { role: "Junior Developer", org: "Bedrijfsnaam", period: "2018 — 2020", body: "Full-stack feature-werk en de eerste interne CI-pipelines. Waar de DevOps-microbe begon.", tags: ["TypeScript", "Docker", "GitLab CI"] },
+    // Mirrors the EN entries — same employers, periods and tags, with the
+    // body lines translated. Keep these in sync when EN copy changes.
+    { role: "Medior Software Engineer", org: "Axxit", period: "2026 - heden",
+      body: ".NET-services en React-frontends bouwen op Azure, met infrastructuur via Terraform en releases via GitHub Actions.",
+      tags: ["Azure", "GitHub", "Terraform", ".NET", "React"] },
+    { role: "DevOps Engineer", org: "Tomorrowland", period: "2025 — 2026",
+      body: "Kubernetes-workloads draaien op AWS voor evenement-volume verkeer, met infrastructuur in Terraform en continue uitrol via ArgoCD.",
+      tags: ["AWS", "GitHub", "Kubernetes", "Terraform", "ArgoCD"] },
+    { role: "DevOps Engineer", org: "CloudFuel", period: "2024 - 2025",
+      body: "Kubernetes-platformen ontworpen en beheerd op Azure voor .NET-workloads, met Terraform-infrastructuur en GitOps-deploys via ArgoCD.",
+      tags: ["Azure", "GitHub", "Kubernetes", "Docker", ".NET", "Terraform", "ArgoCD"] },
+    { role: "Junior Cloud Application and Platform Engineer", org: "Inetum-RealDolmen", period: "2023 - 2024",
+      body: "Gecontaineriseerde .NET-applicaties uitgerold op Azure, met Terraform voor infrastructuur en Azure DevOps-pipelines voor build en release.",
+      tags: ["Azure", "Docker", "Azure DevOps", ".NET", "Terraform"] },
   ],
   education: [
     { title: "Toegepaste Informatica", org: "HoGent, België", period: "2020 - 2023" },
@@ -259,13 +282,24 @@ const FR = {
   },
   services: [
     { n: "01", title: "Infrastructure & Cloud", body: "Provisionner et faire évoluer l'infrastructure cloud en tant que code — Kubernetes, Terraform et architectures multi-cloud conçues pour encaisser un trafic réel.", tags: ["Kubernetes", "Terraform", "AWS / Azure"] },
-    { n: "02", title: "CI/CD & Automatisation", body: "Des pipelines qui compilent, testent et déploient sans accroc. Des mises en production sans interruption aux environnements entièrement automatisés.", tags: ["GitLab CI", "GitHub Actions", "ArgoCD"] },
-    { n: "03", title: "Développement logiciel", body: "Des services backend et des outils faits pour être lus — propres, observables et testés. Go et Python là où ça compte.", tags: ["Go", "Python", "TypeScript"] },
+    { n: "02", title: "CI/CD & Automatisation", body: "Des pipelines qui compilent, testent et déploient sans accroc. Des mises en production sans interruption aux environnements entièrement automatisés.", tags: ["GitHub Actions", "Azure DevOps", "ArgoCD"] },
+    { n: "03", title: "Développement logiciel", body: "Des services backend et des outils faits pour être lus — propres, observables et testés.", tags: [".NET", "React"] },
   ],
   experience: [
-    { role: "Senior DevOps Engineer", org: "Nom de l'entreprise", period: "2023 — aujourd'hui", body: "Je pilote l'automatisation de l'infrastructure pour plusieurs équipes produit. Temps de déploiement réduits d'environ 70 % grâce à une plateforme CI/CD reconstruite, et migration des workloads vers Kubernetes managé.", tags: ["Kubernetes", "Terraform", "ArgoCD"] },
-    { role: "Software Engineer", org: "Nom de l'entreprise", period: "2020 — 2023", body: "J'ai construit et exploité des services backend et l'automatisation associée. Responsable de la stack d'observabilité et des outils d'astreinte.", tags: ["Go", "Python", "AWS"] },
-    { role: "Junior Developer", org: "Nom de l'entreprise", period: "2018 — 2020", body: "Développement full-stack et les premiers pipelines CI internes. C'est là qu'a commencé le virus du DevOps.", tags: ["TypeScript", "Docker", "GitLab CI"] },
+    // Mirrors the EN entries — same employers, periods and tags, with the
+    // body lines translated. Keep these in sync when EN copy changes.
+    { role: "Medior Software Engineer", org: "Axxit", period: "2026 - aujourd'hui",
+      body: "Développement de services .NET et de front-ends React sur Azure, avec une infrastructure provisionnée via Terraform et livrée via GitHub Actions.",
+      tags: ["Azure", "GitHub", "Terraform", ".NET", "React"] },
+    { role: "DevOps Engineer", org: "Tomorrowland", period: "2025 — 2026",
+      body: "Exploitation de workloads Kubernetes sur AWS pour un trafic d'événement à grande échelle, avec une infrastructure gérée en Terraform et un déploiement continu via ArgoCD.",
+      tags: ["AWS", "GitHub", "Kubernetes", "Terraform", "ArgoCD"] },
+    { role: "DevOps Engineer", org: "CloudFuel", period: "2024 - 2025",
+      body: "Conception et exploitation de plateformes Kubernetes sur Azure pour des workloads .NET, avec une infrastructure Terraform et des déploiements GitOps via ArgoCD.",
+      tags: ["Azure", "GitHub", "Kubernetes", "Docker", ".NET", "Terraform", "ArgoCD"] },
+    { role: "Junior Cloud Application and Platform Engineer", org: "Inetum-RealDolmen", period: "2023 - 2024",
+      body: "Livraison d'applications .NET conteneurisées sur Azure, avec Terraform pour l'infrastructure et des pipelines Azure DevOps pour le build et le release.",
+      tags: ["Azure", "Docker", "Azure DevOps", ".NET", "Terraform"] },
   ],
   education: [
     { title: "Informatique appliquée", org: "HoGent, Belgique", period: "2020 - 2023" },

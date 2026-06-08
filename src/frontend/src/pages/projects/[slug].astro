@@ -16,18 +16,35 @@ const site = (Astro.site ?? new URL('https://nomaddigital.dev')).href.replace(/\
 
 const title = `${project.title} — ${project.kind} by Michiel Van Herreweghe`;
 const description = project.desc;
-const url = `${site}/projects/${slug}`;
+const url = `${site}/projects/${slug}/`;
+
+// project.year is a 4-digit string in i18n.jsx (e.g. "2025"). Schema.org
+// accepts ISO 8601 — emit just the year (valid 8601 date) and skip when
+// missing rather than fabricating a precision we don't have.
+const dateCreated = project.year && /^\d{4}$/.test(project.year) ? project.year : undefined;
 
 const projectLd = {
   '@context': 'https://schema.org',
   '@type': 'CreativeWork',
+  '@id': url + '#project',
   name: project.title,
   description,
   url,
   image: project.cover ? new URL(project.cover, site).href : undefined,
-  dateCreated: project.year,
-  creator: { '@type': 'Person', name: I18N.en.name, url: site + '/' },
+  ...(dateCreated ? { dateCreated } : {}),
+  creator: { '@type': 'Person', '@id': site + '/#person', name: I18N.en.name, url: site + '/' },
   ...(project.href && project.href !== '#' ? { sameAs: project.href } : {}),
+  ...(project.kind ? { genre: project.kind } : {}),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: site + '/' },
+    { '@type': 'ListItem', position: 2, name: 'Work', item: site + '/portfolio/' },
+    { '@type': 'ListItem', position: 3, name: project.title, item: url },
+  ],
 };
 ---
 
@@ -36,7 +53,7 @@ const projectLd = {
   description={description}
   image={project.cover}
   type="article"
-  jsonLd={projectLd}
+  jsonLd={[projectLd, breadcrumbLd]}
 >
   <div id="root">
     <Site client:load initialRoute="project" initialParam={slug} />
