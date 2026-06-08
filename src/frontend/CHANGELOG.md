@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.4](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.3...portfolio-frontend-v2.1.4) (2026-06-08)
+
+
+### Bug Fixes
+
+* scripts loading blocked ([#30](https://github.com/MichielVanHerreweghe/portfolio/issues/30)) ([54b3688](https://github.com/MichielVanHerreweghe/portfolio/commit/54b36883f442407909a7af709d475cfc2264603b))
+
 ## [2.1.3](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.2...portfolio-frontend-v2.1.3) (2026-06-08)
 
 
