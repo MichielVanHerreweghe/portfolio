@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.4...portfolio-frontend-v2.2.0) (2026-06-09)
+
+
+### Features
+
+* add multi-language SEO support ([#32](https://github.com/MichielVanHerreweghe/portfolio/issues/32)) ([b6dee8c](https://github.com/MichielVanHerreweghe/portfolio/commit/b6dee8c30467582f74c409fcab88c5d43101a8f4))
+
 ## [2.1.4](https://github.com/MichielVanHerreweghe/portfolio/compare/portfolio-frontend-v2.1.3...portfolio-frontend-v2.1.4) (2026-06-08)
 
 
