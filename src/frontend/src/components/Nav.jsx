@@ -32,7 +32,7 @@ export function Nav({ route, go, theme, toggleTheme, switchLang }) {
     return () => document.removeEventListener("click", h);
   }, [langOpen]);
 
-  const links = [["home", u.navHome], ["portfolio", u.navWork], ["about", u.navAbout]];
+  const links = [["home", u.navHome], ["portfolio", u.navWork], ["blog", u.navBlog], ["about", u.navAbout]];
   const nav = (id) => { setOpen(false); go(id); };
   // Render nav items as real <a href> (crawlable, work without JS) but
   // intercept plain left-clicks so client-side navigation keeps the SPA feel.

@@ -1,0 +1,34 @@
+---
+import { render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import BlogChrome from '../../components/BlogChrome.jsx';
+import { blogPostSeo, localeUrl, LOCALES } from '../../lib/seo.js';
+import { postsForLang, slugOf, toCard } from '../../lib/blog.js';
+
+export async function getStaticPaths() {
+  const posts = await postsForLang('en');
+  return posts.map((entry) => ({ params: { slug: slugOf(entry) }, props: { entry } }));
+}
+
+const lang = 'en';
+const { entry } = Astro.props;
+const { slug } = Astro.params;
+const post = toCard(entry);
+const seo = blogPostSeo(lang, entry.data, slug);
+const langPaths = Object.fromEntries(LOCALES.map((l) => [l, localeUrl(l, `blog/${slug}`)]));
+const { Content } = await render(entry);
+---
+
+<Layout
+  title={seo.title}
+  description={seo.description}
+  image={seo.image}
+  type={seo.type}
+  lang={seo.lang}
+  path={seo.path}
+  jsonLd={seo.jsonLd}
+>
+  <BlogChrome client:load post={post} lang={lang} langPaths={langPaths}>
+    <Content />
+  </BlogChrome>
+</Layout>

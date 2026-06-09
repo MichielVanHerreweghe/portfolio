@@ -17,8 +17,10 @@ export const ROUTES = ['home', 'portfolio', 'about'];
 /** Logical route + optional param → path segment (no locale, no slashes). */
 function segmentFor(route, param) {
   if (route === 'project' && param) return 'projects/' + param;
+  if (route === 'post' && param) return 'blog/' + param;
   if (route === 'portfolio') return 'portfolio';
   if (route === 'about') return 'about';
+  if (route === 'blog') return 'blog';
   return ''; // home
 }
 

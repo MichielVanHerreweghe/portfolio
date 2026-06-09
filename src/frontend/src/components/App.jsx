@@ -76,6 +76,13 @@ function App({ initialRoute, initialParam }) {
       setRoute("project"); setParam(id);
       return;
     }
+    // The blog is rendered by Astro (Markdown content collections), so it lives
+    // outside the SPA — navigate to it with a real page load rather than a
+    // pushState that the SPA router can't satisfy.
+    if (target === "blog") {
+      location.href = pathFor("blog", null, lang);
+      return;
+    }
     if (!ROUTES.includes(target) || (target === route && !param)) {
       if (target === route) window.scrollTo({ top: 0, behavior: "smooth" });
       return;

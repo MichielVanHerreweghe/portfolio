@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlogApp from '../components/BlogApp.jsx';
+import { blogSeo, localeUrl, LOCALES } from '../lib/seo.js';
+import { postsForLang, toCard } from '../lib/blog.js';
+
+const lang = 'en';
+const posts = (await postsForLang(lang)).map(toCard);
+const seo = blogSeo(lang, posts);
+const langPaths = Object.fromEntries(LOCALES.map((l) => [l, localeUrl(l, 'blog')]));
+---
+
+<Layout title={seo.title} description={seo.description} lang={seo.lang} path={seo.path} jsonLd={seo.jsonLd}>
+  <BlogApp client:load posts={posts} lang={lang} langPaths={langPaths} />
+</Layout>

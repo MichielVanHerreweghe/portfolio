@@ -158,6 +158,90 @@ export function portfolioSeo(lang) {
   return { lang, path: 'portfolio', title, description, jsonLd: [listLd, breadcrumbLd] };
 }
 
+/** Blog index: Blog + ItemList of the posts, plus a breadcrumb. `posts` is the
+ *  locale's post list — plain objects { title, slug, ... } from the content
+ *  collection (Astro build-time), sorted newest-first. */
+export function blogSeo(lang, posts = []) {
+  const C = I18N[lang] || I18N[DEFAULT_LOCALE];
+  const description = C.ui.blogIntro;
+  const title = `${C.ui.navBlog} — ${C.ui.blogH1a} ${C.ui.blogH1b}`;
+  const url = localeUrl(lang, 'blog');
+  const blogLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': `${url}#blog`,
+    name: title,
+    description,
+    url,
+    inLanguage: lang,
+    author: { '@type': 'Person', '@id': PERSON_ID },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: posts.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: p.title,
+        url: localeUrl(lang, `blog/${p.slug}`),
+      })),
+    },
+  };
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: C.ui.navHome, item: localeUrl(lang, '') },
+      { '@type': 'ListItem', position: 2, name: C.ui.navBlog, item: url },
+    ],
+  };
+  return { lang, path: 'blog', title, description, jsonLd: [blogLd, breadcrumbLd] };
+}
+
+/** Blog post: BlogPosting + breadcrumb. `post` is the entry's frontmatter
+ *  ({ title, description, date, cover, tags }); `slug` is language-neutral. */
+export function blogPostSeo(lang, post, slug) {
+  const C = I18N[lang] || I18N[DEFAULT_LOCALE];
+  const description = post.description;
+  const title = `${post.title} · ${C.name}`;
+  const url = localeUrl(lang, `blog/${slug}`);
+  // post.date is a Date (z.coerce.date); datePublished wants an ISO 8601 string.
+  const datePublished =
+    post.date instanceof Date ? post.date.toISOString() : post.date || undefined;
+  const postLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#post`,
+    headline: post.title,
+    name: post.title,
+    description,
+    url,
+    mainEntityOfPage: url,
+    inLanguage: lang,
+    image: post.cover ? new URL(post.cover, SITE).href : `${SITE}/og.png`,
+    ...(datePublished ? { datePublished } : {}),
+    author: { '@type': 'Person', '@id': PERSON_ID, name: C.name, url: `${SITE}/` },
+    publisher: { '@id': PERSON_ID },
+    ...(post.tags && post.tags.length ? { keywords: post.tags.join(', ') } : {}),
+  };
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: C.ui.navHome, item: localeUrl(lang, '') },
+      { '@type': 'ListItem', position: 2, name: C.ui.navBlog, item: localeUrl(lang, 'blog') },
+      { '@type': 'ListItem', position: 3, name: post.title, item: url },
+    ],
+  };
+  return {
+    lang,
+    path: `blog/${slug}`,
+    title,
+    description,
+    image: post.cover,
+    type: 'article',
+    jsonLd: [postLd, breadcrumbLd],
+  };
+}
+
 /** Project case-study: CreativeWork + breadcrumb. `project` is the localized
  *  project object (from I18N[lang].projects); `slug` is language-neutral. */
 export function projectSeo(lang, project, slug) {
