@@ -1,49 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Site from '../components/App.jsx';
-import { I18N } from '../lib/i18n.jsx';
+import { portfolioSeo } from '../lib/seo.js';
 
-const C = I18N.en;
-const site = (Astro.site ?? new URL('https://nomaddigital.dev')).href.replace(/\/$/, '');
-
-const title = 'Work — Websites designed & built by Michiel Van Herreweghe';
-const description = C.ui.portfolioIntro;
-
-// ItemList of the projects so the listing page is itself structured data.
-// URLs match the canonical (`/portfolio/`, `/projects/<slug>/`) — Google
-// flags mismatched canonical/itemList URLs as a soft warning.
-const listLd = {
-  '@context': 'https://schema.org',
-  '@type': 'CollectionPage',
-  '@id': site + '/portfolio/#collection',
-  name: title,
-  description,
-  url: site + '/portfolio/',
-  inLanguage: 'en',
-  mainEntity: {
-    '@type': 'ItemList',
-    itemListElement: C.projects.map((p, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: p.title,
-      url: `${site}/projects/${p.slug || p.id}/`,
-    })),
-  },
-};
-
-// BreadcrumbList — Home › Work
-const breadcrumbLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: site + '/' },
-    { '@type': 'ListItem', position: 2, name: 'Work', item: site + '/portfolio/' },
-  ],
-};
+const seo = portfolioSeo('en');
 ---
 
-<Layout title={title} description={description} jsonLd={[listLd, breadcrumbLd]}>
+<Layout title={seo.title} description={seo.description} lang={seo.lang} path={seo.path} jsonLd={seo.jsonLd}>
   <div id="root">
-    <Site client:load initialRoute="portfolio" />
+    <Site client:idle initialRoute="portfolio" initialLang="en" />
   </div>
 </Layout>

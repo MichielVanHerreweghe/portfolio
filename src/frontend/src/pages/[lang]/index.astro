@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Site from '../../components/App.jsx';
+import { homeSeo, LOCALES, DEFAULT_LOCALE } from '../../lib/seo.js';
+
+// One static page per non-default locale (/nl/, /fr/). English lives at the root.
+export function getStaticPaths() {
+  return LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const seo = homeSeo(lang);
+---
+
+<Layout title={seo.title} description={seo.description} lang={seo.lang} path={seo.path} jsonLd={seo.jsonLd}>
+  <div id="root">
+    <Site client:idle initialRoute="home" initialLang={lang} />
+  </div>
+</Layout>

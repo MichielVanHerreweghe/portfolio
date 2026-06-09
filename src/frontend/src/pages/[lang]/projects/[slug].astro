@@ -1,0 +1,36 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Site from '../../../components/App.jsx';
+import { I18N } from '../../../lib/i18n.jsx';
+import { projectSeo, LOCALES, DEFAULT_LOCALE } from '../../../lib/seo.js';
+
+// One static page per (non-default locale × project). Slugs are
+// language-neutral; the project copy is localized.
+export function getStaticPaths() {
+  const out = [];
+  for (const lang of LOCALES.filter((l) => l !== DEFAULT_LOCALE)) {
+    for (const p of I18N[lang].projects) {
+      out.push({ params: { lang, slug: p.slug || p.id }, props: { project: p } });
+    }
+  }
+  return out;
+}
+
+const { lang, slug } = Astro.params;
+const { project } = Astro.props;
+const seo = projectSeo(lang, project, slug);
+---
+
+<Layout
+  title={seo.title}
+  description={seo.description}
+  image={seo.image}
+  type={seo.type}
+  lang={seo.lang}
+  path={seo.path}
+  jsonLd={seo.jsonLd}
+>
+  <div id="root">
+    <Site client:idle initialRoute="project" initialParam={slug} initialLang={lang} />
+  </div>
+</Layout>

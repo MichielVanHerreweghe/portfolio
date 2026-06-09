@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { alternatesFor, OG_LOCALE, LOCALES } from '../lib/seo.js';
 
 interface Props {
   title?: string;
@@ -12,6 +13,11 @@ interface Props {
   noindex?: boolean;
   /** One or more schema.org JSON-LD objects to embed. */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Page locale — drives <html lang>, og:locale and the active hreflang. */
+  lang?: string;
+  /** Logical path without locale prefix ('', 'about', 'portfolio',
+   *  'projects/<slug>') — used to build the hreflang alternates. */
+  path?: string;
 }
 
 const {
@@ -21,6 +27,8 @@ const {
   type = 'website',
   noindex = false,
   jsonLd,
+  lang = 'en',
+  path = '',
 } = Astro.props;
 
 // Astro.site is set in astro.config.mjs. Fall back gracefully if it's missing.
@@ -28,10 +36,15 @@ const site = Astro.site ?? new URL('https://nomaddigital.dev');
 const canonical = new URL(Astro.url.pathname, site).href;
 const imageUrl = new URL(image, site).href;
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+
+// hreflang alternates — each language at its own real URL (+ x-default).
+const alternates = alternatesFor(path);
+const ogLocale = OG_LOCALE[lang] ?? 'en_US';
+const ogLocaleAlternates = LOCALES.filter((l) => l !== lang).map((l) => OG_LOCALE[l]);
 ---
 
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang={lang} data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -44,18 +57,18 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="author" content="Michiel Van Herreweghe" />
     <meta name="theme-color" content="#0B0B0C" />
 
-    {/* hreflang — all three language variants of every page live at the
-        same URL (i18n is currently a client-side localStorage swap), so we
-        advertise the canonical URL for each `hreflang` plus `x-default`.
-        This is the minimum signal that the EN URL is intended to serve all
-        three audiences until path-prefix i18n is introduced. */}
-    <link rel="alternate" hreflang="en" href={canonical} />
-    <link rel="alternate" hreflang="nl" href={canonical} />
-    <link rel="alternate" hreflang="fr" href={canonical} />
-    <link rel="alternate" hreflang="x-default" href={canonical} />
+    {/* hreflang — each locale lives at its own URL (English at the root,
+        Dutch/French path-prefixed), so we advertise the real per-language URL
+        plus x-default → the English (default) URL. */}
+    {alternates.map((a) => (
+      <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+    ))}
 
     <!-- Icons -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
@@ -67,9 +80,10 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={title} />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:locale:alternate" content="nl_BE" />
-    <meta property="og:locale:alternate" content="fr_BE" />
+    <meta property="og:locale" content={ogLocale} />
+    {ogLocaleAlternates.map((l) => (
+      <meta property="og:locale:alternate" content={l} />
+    ))}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -78,26 +92,29 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:image:alt" content={title} />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    {/* Fonts — self-hosted (see scripts/fetch-fonts.mjs). No third-party origin:
+        visitor IPs never reach Google (GDPR) and the CSP needs no font CDN
+        allowance. fonts.css carries @font-face with `display: swap` (text shows
+        immediately in the fallback) and per-subset unicode-range (latin-ext only
+        downloads when a glyph needs it). The body font is preloaded so the LCP
+        heading swaps without a flash. Font preloads are CORS-fetched, hence
+        crossorigin even though same-origin. */}
+    <link rel="preload" href="/fonts/space-grotesk-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
 
     {jsonLdBlocks.map((block) => (
       <script type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}
 
-    {/* Apply persisted theme + language before paint to avoid a flash. */}
+    {/* Apply persisted theme before paint (avoids a flash). Language is NOT
+        touched here — the URL (path-prefix i18n) is the source of truth, and
+        <html lang> is set server-side per locale, so a stale localStorage value
+        must not override it. */}
     <script is:inline>
       (function () {
         try {
           var t = localStorage.getItem('mvh-theme');
           document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
-          var l = localStorage.getItem('mvh-lang');
-          if (l === 'en' || l === 'nl' || l === 'fr') document.documentElement.lang = l;
         } catch (e) {}
       })();
     </script>

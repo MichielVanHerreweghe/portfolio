@@ -14,7 +14,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "optimize:images": "node scripts/optimize-images.mjs",
-    "og:image": "node scripts/generate-og-image.mjs"
+    "og:image": "node scripts/generate-og-image.mjs",
+    "favicons": "node scripts/generate-favicons.mjs",
+    "fonts": "node scripts/fetch-fonts.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.2.0",

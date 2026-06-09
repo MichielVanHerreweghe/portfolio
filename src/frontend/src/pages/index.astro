@@ -1,46 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Site from '../components/App.jsx';
-import { I18N } from '../lib/i18n.jsx';
+import { homeSeo } from '../lib/seo.js';
 
-const C = I18N.en;
-const site = (Astro.site ?? new URL('https://nomaddigital.dev')).href.replace(/\/$/, '');
-
-const title = 'Michiel Van Herreweghe — DevOps & Software Engineer';
-const description = C.ui.heroIntro;
-
-// schema.org Person — helps Google build a knowledge panel and understand who
-// this site is about.
-const personLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  '@id': site + '/#person',
-  name: C.name,
-  url: site + '/',
-  image: site + '/og.png',
-  jobTitle: C.role,
-  description,
-  address: { '@type': 'PostalAddress', addressCountry: 'BE', addressRegion: C.location },
-  knowsAbout: C.stack,
-  sameAs: C.socials.map((s) => s.href),
-};
-
-// schema.org WebSite — gives Google the formal site name (sitelinks) and pairs
-// with the Person via `publisher` so the knowledge graph links them.
-const websiteLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  '@id': site + '/#website',
-  url: site + '/',
-  name: C.name,
-  description,
-  inLanguage: ['en', 'nl', 'fr'],
-  publisher: { '@id': site + '/#person' },
-};
+const seo = homeSeo('en');
 ---
 
-<Layout title={title} description={description} jsonLd={[websiteLd, personLd]}>
+<Layout title={seo.title} description={seo.description} lang={seo.lang} path={seo.path} jsonLd={seo.jsonLd}>
   <div id="root">
-    <Site client:load initialRoute="home" />
+    <Site client:idle initialRoute="home" initialLang="en" />
   </div>
 </Layout>

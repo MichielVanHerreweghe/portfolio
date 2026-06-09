@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Site from '../../components/App.jsx';
+import { aboutSeo, LOCALES, DEFAULT_LOCALE } from '../../lib/seo.js';
+
+export function getStaticPaths() {
+  return LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const seo = aboutSeo(lang);
+---
+
+<Layout title={seo.title} description={seo.description} lang={seo.lang} path={seo.path} jsonLd={seo.jsonLd}>
+  <div id="root">
+    <Site client:idle initialRoute="about" initialLang={lang} />
+  </div>
+</Layout>
