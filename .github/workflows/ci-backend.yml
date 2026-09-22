@@ -29,7 +29,7 @@ defaults:
 jobs:
   build:
     name: Restore, build & test
-    runs-on: ${{ github.event.inputs.runner }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || 'ubuntu-latest' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
 
   docker:
     name: Validate Docker build
-    runs-on: ${{ github.event.inputs.runner }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner || 'ubuntu-latest' }}
     needs: build
     steps:
       - name: Checkout
