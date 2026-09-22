@@ -5,6 +5,14 @@ on:
     paths:
       - 'src/backend/**'
       - '.github/workflows/ci-backend.yml'
+  workflow_dispatch:
+    inputs:
+        runner:
+            type: choice
+            description: What runner to use
+            options:
+            - ubuntu-latest
+            - arc-runner-set
 
 concurrency:
   group: ci-backend-${{ github.ref }}
@@ -21,7 +29,7 @@ defaults:
 jobs:
   build:
     name: Restore, build & test
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.inputs.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,7 +50,7 @@ jobs:
 
   docker:
     name: Validate Docker build
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.inputs.runner }}
     needs: build
     steps:
       - name: Checkout
